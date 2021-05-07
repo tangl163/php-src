@@ -5,7 +5,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | http://www.php.net/license/3_01.txt                                  |
+   | https://www.php.net/license/3_01.txt                                 |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -76,7 +76,7 @@ PHPDBG_API int _phpdbg_asprintf(char **buf, const char *format, ...);
 #endif
 
 PHPDBG_API void phpdbg_free_err_buf(void);
-PHPDBG_API void phpdbg_activate_err_buf(zend_bool active);
+PHPDBG_API void phpdbg_activate_err_buf(bool active);
 PHPDBG_API int phpdbg_output_err_buf(const char *tag, const char *xmlfmt, const char *strfmt, ...);
 
 

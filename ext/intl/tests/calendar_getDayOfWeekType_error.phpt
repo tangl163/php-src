@@ -5,7 +5,7 @@ date.timezone=Atlantic/Azores
 --SKIPIF--
 <?php
 if (!extension_loaded('intl'))
-	die('skip intl extension not enabled');
+    die('skip intl extension not enabled');
 --FILE--
 <?php
 $c = new IntlGregorianCalendar(NULL, 'pt_PT');
@@ -21,7 +21,7 @@ try {
 } catch (\TypeError $e) {
     echo $e->getMessage() . \PHP_EOL;
 }
-
+?>
 --EXPECT--
 IntlCalendar::getDayOfWeekType(): Argument #1 ($dayOfWeek) must be a valid day of the week
 intlcal_get_day_of_week_type(): Argument #1 ($calendar) must be of type IntlCalendar, int given

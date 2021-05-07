@@ -9,9 +9,6 @@ if (PHP_INT_SIZE != 8) die("skip this test is for 64bit platform only");
 --FILE--
 <?php
 echo "*** Testing dechex() : usage variations ***\n";
-//get an unset variable
-$unset_var = 10;
-unset ($unset_var);
 
 // heredoc string
 $heredoc = <<<EOT
@@ -43,10 +40,6 @@ $inputs = array(
        12.3456789000E-10,
        .5,
 
-       // null data
-/*12*/ NULL,
-       null,
-
        // boolean data
 /*14*/ true,
        false,
@@ -66,26 +59,24 @@ $inputs = array(
        // object data
 /*24*/ new classA(),
 
-       // undefined data
-/*25*/ @$undefined_var,
-
-       // unset data
-/*26*/ @$unset_var,
-
        // resource variable
 /*27*/ $fp
 );
 
 // loop through each element of $inputs to check the behaviour of dechex()
-$iterator = 1;
-foreach($inputs as $input) {
+foreach($inputs as $i => $input) {
+    $iterator = $i + 1;
     echo "\n-- Iteration $iterator --\n";
-    var_dump(dechex($input));
-    $iterator++;
-};
+    try {
+       var_dump(dechex($input));
+    } catch (TypeError $exception) {
+        echo $exception->getMessage() . "\n";
+    }
+}
 fclose($fp);
+
 ?>
---EXPECTF--
+--EXPECT--
 *** Testing dechex() : usage variations ***
 
 -- Iteration 1 --
@@ -101,10 +92,10 @@ string(4) "3039"
 string(16) "fffffffffffff6d7"
 
 -- Iteration 5 --
-string(1) "0"
+dechex(): Argument #1 ($num) must be of type int, float given
 
 -- Iteration 6 --
-string(1) "0"
+dechex(): Argument #1 ($num) must be of type int, float given
 
 -- Iteration 7 --
 string(1) "a"
@@ -122,7 +113,7 @@ string(1) "0"
 string(1) "0"
 
 -- Iteration 12 --
-string(1) "0"
+string(1) "1"
 
 -- Iteration 13 --
 string(1) "0"
@@ -134,39 +125,25 @@ string(1) "1"
 string(1) "0"
 
 -- Iteration 16 --
-string(1) "1"
+dechex(): Argument #1 ($num) must be of type int, string given
 
 -- Iteration 17 --
-string(1) "0"
+dechex(): Argument #1 ($num) must be of type int, string given
 
 -- Iteration 18 --
-string(1) "0"
+dechex(): Argument #1 ($num) must be of type int, array given
 
 -- Iteration 19 --
-string(1) "0"
+dechex(): Argument #1 ($num) must be of type int, string given
 
 -- Iteration 20 --
-string(1) "0"
+dechex(): Argument #1 ($num) must be of type int, string given
 
 -- Iteration 21 --
-string(1) "0"
+dechex(): Argument #1 ($num) must be of type int, string given
 
 -- Iteration 22 --
-string(1) "0"
+dechex(): Argument #1 ($num) must be of type int, classA given
 
 -- Iteration 23 --
-string(1) "0"
-
--- Iteration 24 --
-
-Notice: Object of class classA could not be converted to int in %s on line %d
-string(1) "1"
-
--- Iteration 25 --
-string(1) "0"
-
--- Iteration 26 --
-string(1) "0"
-
--- Iteration 27 --
-string(%d) "%s"
+dechex(): Argument #1 ($num) must be of type int, resource given

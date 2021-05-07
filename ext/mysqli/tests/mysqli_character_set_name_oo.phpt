@@ -1,10 +1,9 @@
 --TEST--
-mysqli_chararcter_set_name(), mysql_client_encoding() [alias]
+mysqli_character_set_name(), mysql_client_encoding() [alias]
 --SKIPIF--
 <?php
-	require_once('skipif.inc');
-	require_once('skipifemb.inc');
-	require_once('skipifconnectfailure.inc');
+require_once('skipif.inc');
+require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
 <?php
@@ -67,6 +66,7 @@ mysqli_chararcter_set_name(), mysql_client_encoding() [alias]
     }
 
     print "done!";
+?>
 --EXPECT--
 my_mysqli object is already closed
 my_mysqli object is already closed

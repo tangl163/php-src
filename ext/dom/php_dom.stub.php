@@ -1,27 +1,27 @@
 <?php
 
-/** @generate-function-entries */
+/** @generate-class-entries */
 
-class DOMDocumentType
+class DOMDocumentType extends DOMNode
 {
 }
 
-class DOMCdataSection
+class DOMCdataSection extends DOMText
 {
     public function __construct(string $data) {}
 }
 
-class DOMComment
+class DOMComment extends DOMCharacterData
 {
     public function __construct(string $data = "") {}
 }
 
 interface DOMParentNode
 {
-    /** @var ...DOMNode|string $nodes */
+    /** @param DOMNode|string $nodes */
     public function append(...$nodes): void;
 
-    /** @var ...DOMNode|string $nodes */
+    /** @param DOMNode|string $nodes */
     public function prepend(...$nodes): void;
 }
 
@@ -29,13 +29,13 @@ interface DOMChildNode
 {
     public function remove(): void;
 
-    /** @var ...DOMNode|string $nodes */
+    /** @param DOMNode|string $nodes */
     public function before(... $nodes): void;
 
-    /** @var ...DOMNode|string $nodes */
+    /** @param DOMNode|string $nodes */
     public function after(...$nodes): void;
 
-    /** @var ...DOMNode|string $nodes */
+    /** @param DOMNode|string $nodes */
     public function replaceWith(...$nodes): void;
 }
 
@@ -56,8 +56,7 @@ class DOMNode
     /** @return int */
     public function getLineNo() {}
 
-    /** @return string|null
-     */
+    /** @return string|null */
     public function getNodePath() {}
 
     /** @return bool */
@@ -94,6 +93,10 @@ class DOMNode
     public function replaceChild(DOMNode $node, DOMNode $child) {}
 }
 
+class DOMNameSpaceNode
+{
+}
+
 class DOMImplementation
 {
     /** @return void */
@@ -106,20 +109,20 @@ class DOMImplementation
     public function createDocumentType(string $qualifiedName, string $publicId = "", string $systemId = "") {}
 
     /** @return DOMDocument|false */
-    public function createDocument(string $namespace = "", string $qualifiedName = "", ?DOMDocumentType $doctype = null) {}
+    public function createDocument(?string $namespace = null, string $qualifiedName = "", ?DOMDocumentType $doctype = null) {}
 }
 
-class DOMDocumentFragment implements DOMParentNode
+class DOMDocumentFragment extends DOMNode implements DOMParentNode
 {
     public function __construct() {}
 
     /** @return bool */
     public function appendXML(string $data) {}
 
-    /** @var ...DOMNode|string $nodes */
+    /** @param DOMNode|string $nodes */
     public function append(...$nodes): void {}
 
-    /** @var ...DOMNode|string $nodes */
+    /** @param DOMNode|string $nodes */
     public function prepend(...$nodes): void {}
 }
 
@@ -130,11 +133,11 @@ class DOMNodeList implements IteratorAggregate, Countable
 
     public function getIterator(): Iterator {}
 
-    /** @return ?DOMNode */
+    /** @return DOMNode|null */
     public function item(int $index) {}
 }
 
-class DOMCharacterData implements DOMChildNode
+class DOMCharacterData extends DOMNode implements DOMChildNode
 {
     /** @return bool */
     public function appendData(string $data) {}
@@ -151,19 +154,19 @@ class DOMCharacterData implements DOMChildNode
     /** @return bool */
     public function replaceData(int $offset, int $count, string $data) {}
 
-    /** @var ...DOMNode|string $nodes */
+    /** @param DOMNode|string $nodes */
     public function replaceWith(...$nodes): void {}
 
     public function remove(): void {}
 
-    /** @var ...DOMNode|string $nodes */
+    /** @param DOMNode|string $nodes */
     public function before(... $nodes): void {}
 
-    /** @var ...DOMNode|string $nodes */
+    /** @param DOMNode|string $nodes */
     public function after(...$nodes): void {}
 }
 
-class DOMAttr
+class DOMAttr extends DOMNode
 {
     public function __construct(string $name, string $value = "") {}
 
@@ -171,7 +174,7 @@ class DOMAttr
     public function isId() {}
 }
 
-class DOMElement implements DOMParentNode, DOMChildNode
+class DOMElement extends DOMNode implements DOMParentNode, DOMChildNode
 {
     public function __construct(string $qualifiedName, ?string $value = null, string $namespace = "") {}
 
@@ -191,7 +194,7 @@ class DOMElement implements DOMParentNode, DOMChildNode
     public function getElementsByTagName(string $qualifiedName) {}
 
     /** @return DOMNodeList */
-    public function getElementsByTagNameNS(string $namespace, string $localName) {}
+    public function getElementsByTagNameNS(?string $namespace, string $localName) {}
 
     /** @return bool */
     public function hasAttribute(string $qualifiedName) {}
@@ -202,16 +205,16 @@ class DOMElement implements DOMParentNode, DOMChildNode
     /** @return bool */
     public function removeAttribute(string $qualifiedName) {}
 
-    /** @return DOMAttr|false */
+    /** @return void */
     public function removeAttributeNS(?string $namespace, string $localName) {}
 
     /** @return DOMAttr|false */
-    public function removeAttributeNode(string $qualifiedName) {}
+    public function removeAttributeNode(DOMAttr $attr) {}
 
     /** @return DOMAttr|bool */
     public function setAttribute(string $qualifiedName, string $value) {}
 
-    /** @return null|false */
+    /** @return void */
     public function setAttributeNS(?string $namespace, string $qualifiedName, string $value) {}
 
     /** @return DOMAttr|null|false */
@@ -231,23 +234,23 @@ class DOMElement implements DOMParentNode, DOMChildNode
 
     public function remove(): void {}
 
-    /** @var ...DOMNode|string $nodes */
+    /** @param DOMNode|string $nodes */
     public function before(... $nodes): void {}
 
-    /** @var ...DOMNode|string $nodes */
+    /** @param DOMNode|string $nodes */
     public function after(...$nodes): void {}
 
-    /** @var ...DOMNode|string $nodes */
+    /** @param DOMNode|string $nodes */
     public function replaceWith(...$nodes): void {}
 
-    /** @var ...DOMNode|string $nodes */
+    /** @param DOMNode|string $nodes */
     public function append(...$nodes): void {}
 
-    /** @var ...DOMNode|string $nodes */
+    /** @param DOMNode|string $nodes */
     public function prepend(...$nodes): void {}
 }
 
-class DOMDocument implements DOMParentNode
+class DOMDocument extends DOMNode implements DOMParentNode
 {
     public function __construct(string $version = "1.0", string $encoding = "") {}
 
@@ -288,7 +291,7 @@ class DOMDocument implements DOMParentNode
     public function getElementsByTagName(string $qualifiedName) {}
 
     /** @return DOMNodeList */
-    public function getElementsByTagNameNS(string $namespace, string $localName) {}
+    public function getElementsByTagNameNS(?string $namespace, string $localName) {}
 
     /** @return DOMNode|false */
     public function importNode(DOMNode $node, bool $deep = false) {}
@@ -348,18 +351,20 @@ class DOMDocument implements DOMParentNode
     /** @return DOMNode|false */
     public function adoptNode(DOMNode $node) {}
 
-    /** @var ...DOMNode|string $nodes */
+    /** @param DOMNode|string $nodes */
     public function append(...$nodes): void {}
 
-    /** @var ...DOMNode|string $nodes */
+    /** @param DOMNode|string $nodes */
     public function prepend(...$nodes): void {}
 }
 
 final class DOMException extends Exception
 {
+    /** @var int */
+    public $code = 0;
 }
 
-class DOMText
+class DOMText extends DOMCharacterData
 {
     public function __construct(string $data = "") {}
 
@@ -397,7 +402,7 @@ class DOMEntity extends DOMNode
 {
 }
 
-class DOMEntityReference
+class DOMEntityReference extends DOMNode
 {
     public function __construct(string $name) {}
 }
@@ -406,7 +411,7 @@ class DOMNotation extends DOMNode
 {
 }
 
-class DOMProcessingInstruction
+class DOMProcessingInstruction extends DOMNode
 {
     public function __construct(string $name, string $value = "") {}
 }

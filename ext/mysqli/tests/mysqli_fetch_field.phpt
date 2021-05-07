@@ -3,7 +3,6 @@ mysqli_fetch_field()
 --SKIPIF--
 <?php
 require_once('skipif.inc');
-require_once('skipifemb.inc');
 require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
@@ -35,10 +34,6 @@ require_once('skipifconnectfailure.inc');
     if ($tmp->charsetnr != $charsetInfo->number) {
         printf("[004] Expecting charset %s/%d got %d\n",
             $charsetInfo->charset, $charsetInfo->number, $tmp->charsetnr);
-    }
-    if ($tmp->length != $charsetInfo->max_length) {
-        printf("[005] Expecting length %d got %d\n",
-            $charsetInfo->max_length, $tmp->max_length);
     }
     if ($tmp->db != $db) {
         printf("011] Expecting database '%s' got '%s'\n",
@@ -79,7 +74,7 @@ require_once('skipifconnectfailure.inc');
 ?>
 --CLEAN--
 <?php
-	require_once("clean_table.inc");
+    require_once("clean_table.inc");
 ?>
 --EXPECTF--
 object(stdClass)#%d (13) {
@@ -98,7 +93,7 @@ object(stdClass)#%d (13) {
   ["catalog"]=>
   string(%d) "%s"
   ["max_length"]=>
-  int(1)
+  int(0)
   ["length"]=>
   int(11)
   ["charsetnr"]=>
@@ -160,7 +155,7 @@ object(stdClass)#%d (13) {
   ["catalog"]=>
   string(%d) "%s"
   ["max_length"]=>
-  int(1)
+  int(0)
   ["length"]=>
   int(11)
   ["charsetnr"]=>

@@ -19,7 +19,6 @@ $names_arr = array(
   "-1" => -1,
   "TRUE" => TRUE,
   "FALSE" => FALSE,
-  "NULL" => NULL,
   "\"\"" => "",
   "\" \"" => " ",
   "\\0" => "\0",
@@ -54,9 +53,6 @@ Warning: readfile(1): Failed to open stream: No such file or directory in %s on 
 -- Filename: FALSE --
 ValueError: Path cannot be empty
 
--- Filename: NULL --
-ValueError: Path cannot be empty
-
 -- Filename: "" --
 ValueError: Path cannot be empty
 
@@ -65,10 +61,10 @@ ValueError: Path cannot be empty
 Warning: readfile( ): Failed to open stream: Permission denied in %s on line %d
 
 -- Filename: \0 --
-TypeError: readfile(): Argument #1 ($filename) must be a valid path, string given
+ValueError: readfile(): Argument #1 ($filename) must not contain any null bytes
 
 -- Filename: array() --
-TypeError: readfile(): Argument #1 ($filename) must be a valid path, array given
+TypeError: readfile(): Argument #1 ($filename) must be of type string, array given
 
 -- Filename: /no/such/file/dir --
 

@@ -2,8 +2,8 @@
 Phar::buildFromDirectory() - non-directory passed as first parameter
 --SKIPIF--
 <?php
-	if (!extension_loaded("phar")) die("skip");
-	if (substr(PHP_OS, 0, 3) != "WIN") die("skip Windows only test");
+    if (!extension_loaded("phar")) die("skip");
+    if (substr(PHP_OS, 0, 3) != "WIN") die("skip Windows only test");
 ?>
 --INI--
 phar.require_hash=0
@@ -25,4 +25,4 @@ __HALT_COMPILER();
 ?>
 --EXPECTF--
 %s(24) "UnexpectedValueException"
-RecursiveDirectoryIterator::__construct(1,1): %s (code: 2)
+RecursiveDirectoryIterator::__construct(1): %s (code: 2)

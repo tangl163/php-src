@@ -70,9 +70,11 @@ struct fpm_worker_pool_config_s {
 	int pm_start_servers;
 	int pm_min_spare_servers;
 	int pm_max_spare_servers;
+	int pm_max_spawn_rate;
 	int pm_process_idle_timeout;
 	int pm_max_requests;
 	char *pm_status_path;
+	char *pm_status_listen;
 	char *ping_path;
 	char *ping_response;
 	char *access_log;

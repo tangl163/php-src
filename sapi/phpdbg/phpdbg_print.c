@@ -5,7 +5,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | http://www.php.net/license/3_01.txt                                  |
+   | https://www.php.net/license/3_01.txt                                 |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -87,6 +87,13 @@ static inline void phpdbg_print_function_helper(zend_function *method) /* {{{ */
 					efree(decode);
 					opline++;
 				} while (opcode++ < end);
+
+				for (uint32_t i = 0; i < op_array->num_dynamic_func_defs; i++) {
+					zend_op_array *def = op_array->dynamic_func_defs[i];
+					phpdbg_out("\ndynamic def: %i, function name: %.*s\n",
+						i, (int) ZSTR_LEN(def->function_name), ZSTR_VAL(def->function_name));
+					phpdbg_print_function_helper((zend_function *) def);
+				}
 			}
 		} break;
 
@@ -320,7 +327,7 @@ void phpdbg_print_opcodes_method(const char *class, const char *function) {
 static void phpdbg_print_opcodes_ce(zend_class_entry *ce) {
 	zend_function *method;
 	zend_string *method_name;
-	zend_bool first = 1;
+	bool first = 1;
 
 	phpdbg_out("%s %s: %s\n",
 		(ce->type == ZEND_USER_CLASS) ?

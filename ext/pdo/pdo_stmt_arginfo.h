@@ -1,25 +1,25 @@
 /* This is a generated file, edit the .stub.php file instead.
- * Stub hash: 590a642abbc8d54be143a1c595e9e704888e9b5f */
+ * Stub hash: 95416f12e78609bbb9ed2e70835180654f8e78c8 */
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_PDOStatement_bindColumn, 0, 0, 2)
-	ZEND_ARG_TYPE_MASK(0, column, MAY_BE_LONG|MAY_BE_STRING, NULL)
-	ZEND_ARG_INFO(1, param)
-	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, type, IS_LONG, 0, "0")
-	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, maxlen, IS_LONG, 0, "0")
-	ZEND_ARG_INFO_WITH_DEFAULT_VALUE(0, driverdata, "null")
+	ZEND_ARG_TYPE_MASK(0, column, MAY_BE_STRING|MAY_BE_LONG, NULL)
+	ZEND_ARG_TYPE_INFO(1, var, IS_MIXED, 0)
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, type, IS_LONG, 0, "PDO::PARAM_STR")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, maxLength, IS_LONG, 0, "0")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, driverOptions, IS_MIXED, 0, "null")
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_PDOStatement_bindParam, 0, 0, 2)
-	ZEND_ARG_TYPE_MASK(0, parameter, MAY_BE_LONG|MAY_BE_STRING, NULL)
-	ZEND_ARG_INFO(1, param)
+	ZEND_ARG_TYPE_MASK(0, param, MAY_BE_STRING|MAY_BE_LONG, NULL)
+	ZEND_ARG_TYPE_INFO(1, var, IS_MIXED, 0)
 	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, type, IS_LONG, 0, "PDO::PARAM_STR")
-	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, maxlen, IS_LONG, 0, "0")
-	ZEND_ARG_INFO_WITH_DEFAULT_VALUE(0, driverdata, "null")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, maxLength, IS_LONG, 0, "0")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, driverOptions, IS_MIXED, 0, "null")
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_PDOStatement_bindValue, 0, 0, 2)
-	ZEND_ARG_INFO(0, parameter)
-	ZEND_ARG_INFO(0, value)
+	ZEND_ARG_TYPE_MASK(0, param, MAY_BE_STRING|MAY_BE_LONG, NULL)
+	ZEND_ARG_TYPE_INFO(0, value, IS_MIXED, 0)
 	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, type, IS_LONG, 0, "PDO::PARAM_STR")
 ZEND_END_ARG_INFO()
 
@@ -35,32 +35,31 @@ ZEND_END_ARG_INFO()
 #define arginfo_class_PDOStatement_errorInfo arginfo_class_PDOStatement_closeCursor
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_PDOStatement_execute, 0, 0, 0)
-	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, input_parameters, IS_ARRAY, 1, "null")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, params, IS_ARRAY, 1, "null")
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_PDOStatement_fetch, 0, 0, 0)
-	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, fetch_style, IS_LONG, 0, "PDO::FETCH_BOTH")
-	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, cursor_orientation, IS_LONG, 0, "PDO::FETCH_ORI_NEXT")
-	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, cursor_offset, IS_LONG, 0, "0")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, mode, IS_LONG, 0, "PDO::FETCH_DEFAULT")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, cursorOrientation, IS_LONG, 0, "PDO::FETCH_ORI_NEXT")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, cursorOffset, IS_LONG, 0, "0")
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_PDOStatement_fetchAll, 0, 0, 0)
-	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, fetch_style, IS_LONG, 0, "PDO::FETCH_BOTH")
-	ZEND_ARG_INFO(0, fetch_argument)
-	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, ctor_args, IS_ARRAY, 0, "[]")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, mode, IS_LONG, 0, "PDO::FETCH_DEFAULT")
+	ZEND_ARG_VARIADIC_TYPE_INFO(0, args, IS_MIXED, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_PDOStatement_fetchColumn, 0, 0, 0)
-	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, column_number, IS_LONG, 0, "0")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, column, IS_LONG, 0, "0")
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_PDOStatement_fetchObject, 0, 0, 0)
-	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, class_name, IS_STRING, 1, "\"stdClass\"")
-	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, ctor_args, IS_ARRAY, 1, "null")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, class, IS_STRING, 1, "\"stdClass\"")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, constructorArgs, IS_ARRAY, 0, "[]")
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_PDOStatement_getAttribute, 0, 0, 1)
-	ZEND_ARG_TYPE_INFO(0, attribute, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, name, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_PDOStatement_getColumnMeta, 0, 0, 1)
@@ -73,12 +72,12 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_PDOStatement_setAttribute, 0, 0, 2)
 	ZEND_ARG_TYPE_INFO(0, attribute, IS_LONG, 0)
-	ZEND_ARG_INFO(0, value)
+	ZEND_ARG_TYPE_INFO(0, value, IS_MIXED, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_PDOStatement_setFetchMode, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, mode, IS_LONG, 0)
-	ZEND_ARG_VARIADIC_INFO(0, params)
+	ZEND_ARG_VARIADIC_TYPE_INFO(0, args, IS_MIXED, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_class_PDOStatement_getIterator, 0, 0, Iterator, 0)
@@ -135,3 +134,37 @@ static const zend_function_entry class_PDOStatement_methods[] = {
 static const zend_function_entry class_PDORow_methods[] = {
 	ZEND_FE_END
 };
+
+static zend_class_entry *register_class_PDOStatement(zend_class_entry *class_entry_IteratorAggregate)
+{
+	zend_class_entry ce, *class_entry;
+
+	INIT_CLASS_ENTRY(ce, "PDOStatement", class_PDOStatement_methods);
+	class_entry = zend_register_internal_class_ex(&ce, NULL);
+	zend_class_implements(class_entry, 1, class_entry_IteratorAggregate);
+
+	zval property_queryString_default_value;
+	ZVAL_UNDEF(&property_queryString_default_value);
+	zend_string *property_queryString_name = zend_string_init("queryString", sizeof("queryString") - 1, 1);
+	zend_declare_typed_property(class_entry, property_queryString_name, &property_queryString_default_value, ZEND_ACC_PUBLIC, NULL, (zend_type) ZEND_TYPE_INIT_MASK(MAY_BE_STRING));
+	zend_string_release(property_queryString_name);
+
+	return class_entry;
+}
+
+static zend_class_entry *register_class_PDORow(void)
+{
+	zend_class_entry ce, *class_entry;
+
+	INIT_CLASS_ENTRY(ce, "PDORow", class_PDORow_methods);
+	class_entry = zend_register_internal_class_ex(&ce, NULL);
+	class_entry->ce_flags |= ZEND_ACC_FINAL;
+
+	zval property_queryString_default_value;
+	ZVAL_UNDEF(&property_queryString_default_value);
+	zend_string *property_queryString_name = zend_string_init("queryString", sizeof("queryString") - 1, 1);
+	zend_declare_typed_property(class_entry, property_queryString_name, &property_queryString_default_value, ZEND_ACC_PUBLIC, NULL, (zend_type) ZEND_TYPE_INIT_MASK(MAY_BE_STRING));
+	zend_string_release(property_queryString_name);
+
+	return class_entry;
+}

@@ -1,22 +1,22 @@
 /* This is a generated file, edit the .stub.php file instead.
- * Stub hash: dbcdb94753d19921594c48a735d6bd9194b02996 */
+ * Stub hash: b0317673c829b873b95aac34d362cd5ad004aca9 */
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_Spoofchecker___construct, 0, 0, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_Spoofchecker_isSuspicious, 0, 0, 1)
-	ZEND_ARG_TYPE_INFO(0, text, IS_STRING, 0)
-	ZEND_ARG_INFO_WITH_DEFAULT_VALUE(1, error, "null")
+	ZEND_ARG_TYPE_INFO(0, string, IS_STRING, 0)
+	ZEND_ARG_INFO_WITH_DEFAULT_VALUE(1, errorCode, "null")
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_Spoofchecker_areConfusable, 0, 0, 2)
-	ZEND_ARG_TYPE_INFO(0, s1, IS_STRING, 0)
-	ZEND_ARG_TYPE_INFO(0, s2, IS_STRING, 0)
-	ZEND_ARG_INFO_WITH_DEFAULT_VALUE(1, error, "null")
+	ZEND_ARG_TYPE_INFO(0, string1, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, string2, IS_STRING, 0)
+	ZEND_ARG_INFO_WITH_DEFAULT_VALUE(1, errorCode, "null")
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_Spoofchecker_setAllowedLocales, 0, 0, 1)
-	ZEND_ARG_TYPE_INFO(0, locale_list, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, locales, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_Spoofchecker_setChecks, 0, 0, 1)
@@ -51,3 +51,13 @@ static const zend_function_entry class_Spoofchecker_methods[] = {
 #endif
 	ZEND_FE_END
 };
+
+static zend_class_entry *register_class_Spoofchecker(void)
+{
+	zend_class_entry ce, *class_entry;
+
+	INIT_CLASS_ENTRY(ce, "Spoofchecker", class_Spoofchecker_methods);
+	class_entry = zend_register_internal_class_ex(&ce, NULL);
+
+	return class_entry;
+}

@@ -40,11 +40,16 @@ For other systems, see the [installation chapter](https://php.net/install).
 *For Windows, see [Build your own PHP on Windows](https://wiki.php.net/internals/windows/stepbystepbuild_sdk_2).*
 
 For a minimal PHP build from Git, you will need autoconf, bison, and re2c. For
-a default build, you will additionally need libxml2 and libsqlite3. On Ubuntu,
-you can install these using:
+a default build, you will additionally need libxml2 and libsqlite3.
+
+On Ubuntu, you can install these using:
 
     sudo apt install -y pkg-config build-essential autoconf bison re2c \
                         libxml2-dev libsqlite3-dev
+
+On Fedora, you can install these using:
+
+    sudo dnf install re2c bison autoconf make libtool ccache libxml2-devel sqlite-devel
 
 Generate configure:
 
@@ -98,10 +103,8 @@ Extension Community Library - [PECL](https://pecl.php.net).
 
 ## Contributing
 
-The PHP source code is located in the Git repository at
-[git.php.net](https://git.php.net). Contributions are most welcome by forking
-the [GitHub mirror repository](https://github.com/php/php-src) and sending a
-pull request.
+Contributions are most welcome by forking the
+[GitHub repository](https://github.com/php/php-src) and sending a pull request.
 
 Discussions are done on GitHub, but depending on the topic can also be relayed
 to the official PHP developer mailing list internals@lists.php.net.
@@ -122,9 +125,8 @@ ticket at [bugs.php.net](https://bugs.php.net) and reference the bug id using
     magic_quotes behavior and therefore should not raise a warning at any time.
     The patch removes this warning.
 
-Pull requests are not merged directly on GitHub. All PRs will be pulled and
-pushed through [git.php.net](https://git.php.net). See
-[Git workflow](https://wiki.php.net/vcs/gitworkflow) for more details.
+See [Git workflow](https://wiki.php.net/vcs/gitworkflow) for more details on the
+pull request workflow.
 
 ### Guidelines for contributors
 

@@ -5,7 +5,7 @@ date.timezone=Atlantic/Azores
 --SKIPIF--
 <?php
 if (!extension_loaded('intl'))
-	die('skip intl extension not enabled');
+    die('skip intl extension not enabled');
 --FILE--
 <?php
 ini_set("intl.error_level", E_WARNING);
@@ -41,8 +41,9 @@ try {
 } catch (\TypeError $e) {
     echo $e->getMessage() . \PHP_EOL;
 }
+?>
 --EXPECT--
-IntlCalendar::set() expects at most 6 parameters, 7 given
+IntlCalendar::set() expects at most 6 arguments, 7 given
 IntlCalendar::set() has no variant with exactly 4 parameters
 IntlCalendar::set(): Argument #1 ($year) must be a valid field
 intlcal_set(): Argument #2 ($year) must be a valid field

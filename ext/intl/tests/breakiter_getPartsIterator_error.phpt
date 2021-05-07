@@ -3,7 +3,7 @@ IntlBreakIterator::getPartsIterator(): bad args
 --SKIPIF--
 <?php
 if (!extension_loaded('intl'))
-	die('skip intl extension not enabled');
+    die('skip intl extension not enabled');
 --FILE--
 <?php
 ini_set("intl.default_locale", "pt_PT");
@@ -18,4 +18,4 @@ try {
 
 ?>
 --EXPECT--
-IntlBreakIterator::getPartsIterator(): Argument #1 ($key_type) must be one of IntlPartsIterator::KEY_SEQUENTIAL, IntlPartsIterator::KEY_LEFT, or IntlPartsIterator::KEY_RIGHT
+IntlBreakIterator::getPartsIterator(): Argument #1 ($type) must be one of IntlPartsIterator::KEY_SEQUENTIAL, IntlPartsIterator::KEY_LEFT, or IntlPartsIterator::KEY_RIGHT

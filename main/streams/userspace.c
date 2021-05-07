@@ -5,7 +5,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | http://www.php.net/license/3_01.txt                                  |
+   | https://www.php.net/license/3_01.txt                                 |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -310,7 +310,7 @@ static php_stream *user_wrapper_opener(php_stream_wrapper *wrapper, const char *
 	zval args[4];
 	int call_result;
 	php_stream *stream = NULL;
-	zend_bool old_in_user_include;
+	bool old_in_user_include;
 
 	/* Try to catch bad usage without preventing flexibility */
 	if (FG(user_stream_current_filename) != NULL && strcmp(filename, FG(user_stream_current_filename)) == 0) {
@@ -526,21 +526,22 @@ PHP_FUNCTION(stream_wrapper_restore)
 {
 	zend_string *protocol;
 	php_stream_wrapper *wrapper;
-	HashTable *global_wrapper_hash;
+	HashTable *global_wrapper_hash, *wrapper_hash;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "S", &protocol) == FAILURE) {
 		RETURN_THROWS();
 	}
 
 	global_wrapper_hash = php_stream_get_url_stream_wrappers_hash_global();
-	if (php_stream_get_url_stream_wrappers_hash() == global_wrapper_hash) {
-		php_error_docref(NULL, E_NOTICE, "%s:// was never changed, nothing to restore", ZSTR_VAL(protocol));
-		RETURN_TRUE;
-	}
-
 	if ((wrapper = zend_hash_find_ptr(global_wrapper_hash, protocol)) == NULL) {
 		php_error_docref(NULL, E_WARNING, "%s:// never existed, nothing to restore", ZSTR_VAL(protocol));
 		RETURN_FALSE;
+	}
+
+	wrapper_hash = php_stream_get_url_stream_wrappers_hash();
+	if (wrapper_hash == global_wrapper_hash || zend_hash_find_ptr(wrapper_hash, protocol) == wrapper) {
+		php_error_docref(NULL, E_NOTICE, "%s:// was never changed, nothing to restore", ZSTR_VAL(protocol));
+		RETURN_TRUE;
 	}
 
 	/* A failure here could be okay given that the protocol might have been merely unregistered */

@@ -3,7 +3,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | http://www.php.net/license/3_01.txt                                  |
+   | https://www.php.net/license/3_01.txt                                 |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -43,25 +43,26 @@ extern "C" {
 
 U_NAMESPACE_BEGIN
 /**
- * This class isolates our access to private internal methods of
- * MessageFormat.  It is never instantiated; it exists only for C++
- * access management.
+ * ICU declares MessageFormatAdapter as a friend class of MessageFormat,
+ * to use as a backdoor for accessing private MessageFormat members.
+ * We use it for the same purpose here. Prefix the methods with php to
+ * avoid clashes with any definitions in ICU.
  */
 class MessageFormatAdapter {
 public:
-    static const Formattable::Type* getArgTypeList(const MessageFormat& m,
+    static const Formattable::Type* phpGetArgTypeList(const MessageFormat& m,
                                                    int32_t& count);
-    static const MessagePattern getMessagePattern(MessageFormat* m);
+    static const MessagePattern phpGetMessagePattern(MessageFormat* m);
 };
 
 const Formattable::Type*
-MessageFormatAdapter::getArgTypeList(const MessageFormat& m,
+MessageFormatAdapter::phpGetArgTypeList(const MessageFormat& m,
                                      int32_t& count) {
     return m.getArgTypeList(count);
 }
 
 const MessagePattern
-MessageFormatAdapter::getMessagePattern(MessageFormat* m) {
+MessageFormatAdapter::phpGetMessagePattern(MessageFormat* m) {
     return m->msgPattern;
 }
 U_NAMESPACE_END
@@ -77,7 +78,7 @@ using icu::FieldPosition;
 U_CFUNC int32_t umsg_format_arg_count(UMessageFormat *fmt)
 {
 	int32_t fmt_count = 0;
-	MessageFormatAdapter::getArgTypeList(*(const MessageFormat*)fmt, fmt_count);
+	MessageFormatAdapter::phpGetArgTypeList(*(const MessageFormat*)fmt, fmt_count);
 	return fmt_count;
 }
 
@@ -100,7 +101,7 @@ static HashTable *umsg_get_numeric_types(MessageFormatter_object *mfo,
 		return mfo->mf_data.arg_types;
 	}
 
-	const Formattable::Type *types = MessageFormatAdapter::getArgTypeList(
+	const Formattable::Type *types = MessageFormatAdapter::phpGetArgTypeList(
 		*(MessageFormat*)mfo->mf_data.umsgf, parts_count);
 
 	/* Hash table will store Formattable::Type objects directly,
@@ -285,7 +286,7 @@ static HashTable *umsg_get_types(MessageFormatter_object *mfo,
 {
 	MessageFormat *mf = (MessageFormat *)mfo->mf_data.umsgf;
 
-	const MessagePattern mp = MessageFormatAdapter::getMessagePattern(mf);
+	const MessagePattern mp = MessageFormatAdapter::phpGetMessagePattern(mf);
 
 	return umsg_parse_format(mfo, mp, err);
 }

@@ -1,11 +1,11 @@
 /* This is a generated file, edit the .stub.php file instead.
- * Stub hash: fbe25d8a7a0a1de0cbd5dc9118e77a2e8d5dbd67 */
+ * Stub hash: 6f71b9fa3dd098b1401be8c659d03041f7d361c1 */
 
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_TYPE_MASK_EX(arginfo_simplexml_load_file, 0, 1, SimpleXMLElement, MAY_BE_FALSE)
 	ZEND_ARG_TYPE_INFO(0, filename, IS_STRING, 0)
 	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, class_name, IS_STRING, 1, "SimpleXMLElement::class")
 	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, options, IS_LONG, 0, "0")
-	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, namespace_or_prefix, IS_STRING, 0, "\'\'")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, namespace_or_prefix, IS_STRING, 0, "\"\"")
 	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, is_prefix, _IS_BOOL, 0, "false")
 ZEND_END_ARG_INFO()
 
@@ -13,12 +13,12 @@ ZEND_BEGIN_ARG_WITH_RETURN_OBJ_TYPE_MASK_EX(arginfo_simplexml_load_string, 0, 1,
 	ZEND_ARG_TYPE_INFO(0, data, IS_STRING, 0)
 	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, class_name, IS_STRING, 1, "SimpleXMLElement::class")
 	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, options, IS_LONG, 0, "0")
-	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, namespace_or_prefix, IS_STRING, 0, "\'\'")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, namespace_or_prefix, IS_STRING, 0, "\"\"")
 	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, is_prefix, _IS_BOOL, 0, "false")
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_simplexml_import_dom, 0, 1, SimpleXMLElement, 1)
-	ZEND_ARG_OBJ_INFO(0, node, DOMNode, 0)
+	ZEND_ARG_OBJ_TYPE_MASK(0, node, SimpleXMLElement|DOMNode, 0, NULL)
 	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, class_name, IS_STRING, 1, "SimpleXMLElement::class")
 ZEND_END_ARG_INFO()
 
@@ -32,7 +32,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_class_SimpleXMLElement_registerXPathNamespace, 0,
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_SimpleXMLElement_asXML, 0, 0, 0)
-	ZEND_ARG_TYPE_INFO(0, filename, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, filename, IS_STRING, 1, "null")
 ZEND_END_ARG_INFO()
 
 #define arginfo_class_SimpleXMLElement_saveXML arginfo_class_SimpleXMLElement_asXML
@@ -57,7 +57,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_class_SimpleXMLElement___construct, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, data, IS_STRING, 0)
 	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, options, IS_LONG, 0, "0")
 	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, dataIsURL, _IS_BOOL, 0, "false")
-	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, namespaceOrPrefix, IS_STRING, 0, "\'\'")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, namespaceOrPrefix, IS_STRING, 0, "\"\"")
 	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, isPrefix, _IS_BOOL, 0, "false")
 ZEND_END_ARG_INFO()
 
@@ -154,3 +154,24 @@ static const zend_function_entry class_SimpleXMLElement_methods[] = {
 static const zend_function_entry class_SimpleXMLIterator_methods[] = {
 	ZEND_FE_END
 };
+
+static zend_class_entry *register_class_SimpleXMLElement(zend_class_entry *class_entry_Stringable, zend_class_entry *class_entry_Countable, zend_class_entry *class_entry_RecursiveIterator)
+{
+	zend_class_entry ce, *class_entry;
+
+	INIT_CLASS_ENTRY(ce, "SimpleXMLElement", class_SimpleXMLElement_methods);
+	class_entry = zend_register_internal_class_ex(&ce, NULL);
+	zend_class_implements(class_entry, 3, class_entry_Stringable, class_entry_Countable, class_entry_RecursiveIterator);
+
+	return class_entry;
+}
+
+static zend_class_entry *register_class_SimpleXMLIterator(zend_class_entry *class_entry_SimpleXMLElement)
+{
+	zend_class_entry ce, *class_entry;
+
+	INIT_CLASS_ENTRY(ce, "SimpleXMLIterator", class_SimpleXMLIterator_methods);
+	class_entry = zend_register_internal_class_ex(&ce, class_entry_SimpleXMLElement);
+
+	return class_entry;
+}

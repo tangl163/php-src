@@ -1,7 +1,7 @@
 --TEST--
 Bug #43045i (SOAP encoding violation on "INF" for type double/float)
---SKIPIF--
-<?php require_once('skipif.inc'); ?>
+--EXTENSIONS--
+soap
 --FILE--
 <?php
 function test($x) {
@@ -45,6 +45,7 @@ var_dump($client->test(0.1));
 var_dump($client->test(NAN));
 var_dump($response = $client->test(INF));
 var_dump($response = $client->test(-INF));
+?>
 --EXPECT--
 float(0.1)
 float(NAN)

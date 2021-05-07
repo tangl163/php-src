@@ -3,7 +3,6 @@ Interface of the class mysqli
 --SKIPIF--
 <?php
 require_once('skipif.inc');
-require_once('skipifemb.inc');
 require_once('skipifconnectfailure.inc');
 ?>
 --FILE--
@@ -93,7 +92,7 @@ require_once('skipifconnectfailure.inc');
 
     printf("\nClass variables:\n");
 
-    $expected_class_variables = $expected_object_variables = array(
+    $expected_class_variables = [
         "affected_rows" 	=> true,
         "client_info"		=> true,
         "client_version"	=> true,
@@ -111,10 +110,10 @@ require_once('skipifconnectfailure.inc');
         "sqlstate"			=> true,
         "thread_id"			=> true,
         "warning_count"		=> true,
-    );
+        "error_list"		=> true,
+    ];
 
-    $expected_class_variables["error_list"] = true;
-    $expected_object_variables["error_list"] = true;
+    $expected_object_variables = [];
 
     $variables = get_class_vars(get_class($mysqli));
     foreach ($variables as $var => $v) {

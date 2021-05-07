@@ -1,5 +1,5 @@
 /* This is a generated file, edit the .stub.php file instead.
- * Stub hash: 95608dd1d6c2ad80ada990a9e939b76dba705d48 */
+ * Stub hash: d0f7d294c92a3d056e38abc92162c19e10329310 */
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_zip_open, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, filename, IS_STRING, 0)
@@ -16,11 +16,11 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_zip_entry_open, 0, 2, _IS_BOOL, 0)
 	ZEND_ARG_INFO(0, zip_dp)
 	ZEND_ARG_INFO(0, zip_entry)
-	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, mode, IS_STRING, 0, "\'rb\'")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, mode, IS_STRING, 0, "\"rb\"")
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_zip_entry_close, 0, 1, _IS_BOOL, 0)
-	ZEND_ARG_INFO(0, zip_ent)
+	ZEND_ARG_INFO(0, zip_entry)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_MASK_EX(arginfo_zip_entry_read, 0, 1, MAY_BE_STRING|MAY_BE_FALSE)
@@ -157,11 +157,11 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_class_ZipArchive_deleteName, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
-#define arginfo_class_ZipArchive_statName arginfo_class_ZipArchive_open
+#define arginfo_class_ZipArchive_statName arginfo_class_ZipArchive_getCommentName
 
 #define arginfo_class_ZipArchive_statIndex arginfo_class_ZipArchive_getCommentIndex
 
-#define arginfo_class_ZipArchive_locateName arginfo_class_ZipArchive_open
+#define arginfo_class_ZipArchive_locateName arginfo_class_ZipArchive_getCommentName
 
 #define arginfo_class_ZipArchive_getNameIndex arginfo_class_ZipArchive_getCommentIndex
 
@@ -175,11 +175,11 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_ZipArchive_extractTo, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, pathto, IS_STRING, 0)
-	ZEND_ARG_INFO_WITH_DEFAULT_VALUE(0, files, "null")
+	ZEND_ARG_TYPE_MASK(0, files, MAY_BE_ARRAY|MAY_BE_STRING|MAY_BE_NULL, "null")
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_ZipArchive_getFromName, 0, 0, 1)
-	ZEND_ARG_TYPE_INFO(0, entryname, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
 	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, len, IS_LONG, 0, "0")
 	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, flags, IS_LONG, 0, "0")
 ZEND_END_ARG_INFO()
@@ -190,9 +190,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_class_ZipArchive_getFromIndex, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, flags, IS_LONG, 0, "0")
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_class_ZipArchive_getStream, 0, 0, 1)
-	ZEND_ARG_TYPE_INFO(0, entryname, IS_STRING, 0)
-ZEND_END_ARG_INFO()
+#define arginfo_class_ZipArchive_getStream arginfo_class_ZipArchive_deleteName
 
 #if defined(ZIP_OPSYS_DEFAULT)
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_ZipArchive_setExternalAttributesName, 0, 0, 3)
@@ -455,3 +453,50 @@ static const zend_function_entry class_ZipArchive_methods[] = {
 #endif
 	ZEND_FE_END
 };
+
+static zend_class_entry *register_class_ZipArchive(zend_class_entry *class_entry_Countable)
+{
+	zend_class_entry ce, *class_entry;
+
+	INIT_CLASS_ENTRY(ce, "ZipArchive", class_ZipArchive_methods);
+	class_entry = zend_register_internal_class_ex(&ce, NULL);
+	zend_class_implements(class_entry, 1, class_entry_Countable);
+
+	zval property_lastId_default_value;
+	ZVAL_UNDEF(&property_lastId_default_value);
+	zend_string *property_lastId_name = zend_string_init("lastId", sizeof("lastId") - 1, 1);
+	zend_declare_typed_property(class_entry, property_lastId_name, &property_lastId_default_value, ZEND_ACC_PUBLIC, NULL, (zend_type) ZEND_TYPE_INIT_MASK(MAY_BE_LONG));
+	zend_string_release(property_lastId_name);
+
+	zval property_status_default_value;
+	ZVAL_UNDEF(&property_status_default_value);
+	zend_string *property_status_name = zend_string_init("status", sizeof("status") - 1, 1);
+	zend_declare_typed_property(class_entry, property_status_name, &property_status_default_value, ZEND_ACC_PUBLIC, NULL, (zend_type) ZEND_TYPE_INIT_MASK(MAY_BE_LONG));
+	zend_string_release(property_status_name);
+
+	zval property_statusSys_default_value;
+	ZVAL_UNDEF(&property_statusSys_default_value);
+	zend_string *property_statusSys_name = zend_string_init("statusSys", sizeof("statusSys") - 1, 1);
+	zend_declare_typed_property(class_entry, property_statusSys_name, &property_statusSys_default_value, ZEND_ACC_PUBLIC, NULL, (zend_type) ZEND_TYPE_INIT_MASK(MAY_BE_LONG));
+	zend_string_release(property_statusSys_name);
+
+	zval property_numFiles_default_value;
+	ZVAL_UNDEF(&property_numFiles_default_value);
+	zend_string *property_numFiles_name = zend_string_init("numFiles", sizeof("numFiles") - 1, 1);
+	zend_declare_typed_property(class_entry, property_numFiles_name, &property_numFiles_default_value, ZEND_ACC_PUBLIC, NULL, (zend_type) ZEND_TYPE_INIT_MASK(MAY_BE_LONG));
+	zend_string_release(property_numFiles_name);
+
+	zval property_filename_default_value;
+	ZVAL_UNDEF(&property_filename_default_value);
+	zend_string *property_filename_name = zend_string_init("filename", sizeof("filename") - 1, 1);
+	zend_declare_typed_property(class_entry, property_filename_name, &property_filename_default_value, ZEND_ACC_PUBLIC, NULL, (zend_type) ZEND_TYPE_INIT_MASK(MAY_BE_STRING));
+	zend_string_release(property_filename_name);
+
+	zval property_comment_default_value;
+	ZVAL_UNDEF(&property_comment_default_value);
+	zend_string *property_comment_name = zend_string_init("comment", sizeof("comment") - 1, 1);
+	zend_declare_typed_property(class_entry, property_comment_name, &property_comment_default_value, ZEND_ACC_PUBLIC, NULL, (zend_type) ZEND_TYPE_INIT_MASK(MAY_BE_STRING));
+	zend_string_release(property_comment_name);
+
+	return class_entry;
+}

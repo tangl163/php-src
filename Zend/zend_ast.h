@@ -63,6 +63,7 @@ enum _zend_ast_kind {
 	ZEND_AST_USE,
 	ZEND_AST_TYPE_UNION,
 	ZEND_AST_ATTRIBUTE_LIST,
+	ZEND_AST_ATTRIBUTE_GROUP,
 	ZEND_AST_MATCH_ARM_LIST,
 
 	/* 0 child nodes */
@@ -158,6 +159,10 @@ enum _zend_ast_kind {
 	ZEND_AST_PROP_GROUP,
 	ZEND_AST_PROP_ELEM,
 	ZEND_AST_CONST_ELEM,
+	ZEND_AST_ENUM_CASE,
+
+	// Pseudo node for initializing enums
+	ZEND_AST_CONST_ENUM_INIT,
 
 	/* 4 child nodes */
 	ZEND_AST_FOR = 4 << ZEND_AST_NUM_CHILDREN_SHIFT,
@@ -290,7 +295,7 @@ ZEND_API zend_ast *zend_ast_create_decl(
 	zend_string *name, zend_ast *child0, zend_ast *child1, zend_ast *child2, zend_ast *child3, zend_ast *child4
 );
 
-ZEND_API int ZEND_FASTCALL zend_ast_evaluate(zval *result, zend_ast *ast, zend_class_entry *scope);
+ZEND_API zend_result ZEND_FASTCALL zend_ast_evaluate(zval *result, zend_ast *ast, zend_class_entry *scope);
 ZEND_API zend_string *zend_ast_export(const char *prefix, zend_ast *ast, const char *suffix);
 
 ZEND_API zend_ast_ref * ZEND_FASTCALL zend_ast_copy(zend_ast *ast);
@@ -300,11 +305,11 @@ ZEND_API void ZEND_FASTCALL zend_ast_ref_destroy(zend_ast_ref *ast);
 typedef void (*zend_ast_apply_func)(zend_ast **ast_ptr);
 ZEND_API void zend_ast_apply(zend_ast *ast, zend_ast_apply_func fn);
 
-static zend_always_inline zend_bool zend_ast_is_special(zend_ast *ast) {
+static zend_always_inline bool zend_ast_is_special(zend_ast *ast) {
 	return (ast->kind >> ZEND_AST_SPECIAL_SHIFT) & 1;
 }
 
-static zend_always_inline zend_bool zend_ast_is_list(zend_ast *ast) {
+static zend_always_inline bool zend_ast_is_list(zend_ast *ast) {
 	return (ast->kind >> ZEND_AST_IS_LIST_SHIFT) & 1;
 }
 static zend_always_inline zend_ast_list *zend_ast_get_list(zend_ast *ast) {

@@ -5,7 +5,7 @@ date.timezone=Atlantic/Azores
 --SKIPIF--
 <?php
 if (!extension_loaded('intl'))
-	die('skip intl extension not enabled');
+    die('skip intl extension not enabled');
 --FILE--
 <?php
 ini_set("intl.error_level", E_WARNING);
@@ -24,6 +24,7 @@ try {
     echo $e->getMessage() . \PHP_EOL;
 }
 
+?>
 --EXPECT--
 IntlCalendar::getWeekendTransition(): Argument #1 ($dayOfWeek) must be a valid day of the week
 intlcal_get_weekend_transition(): Argument #1 ($calendar) must be of type IntlCalendar, int given

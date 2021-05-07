@@ -24,20 +24,21 @@ Class [ <internal:Reflection> class ReflectionClass implements Reflector, String
   }
 
   - Properties [1] {
-    Property [ public $name = '' ]
+    Property [ public string $name ]
   }
 
-  - Methods [54] {
-    Method [ <internal:Reflection> final private method __clone ] {
+  - Methods [55] {
+    Method [ <internal:Reflection> private method __clone ] {
 
       - Parameters [0] {
       }
+      - Return [ void ]
     }
 
     Method [ <internal:Reflection, ctor> public method __construct ] {
 
       - Parameters [1] {
-        Parameter #0 [ <required> $objectOrClass ]
+        Parameter #0 [ <required> object|string $objectOrClass ]
       }
     }
 
@@ -166,14 +167,14 @@ Class [ <internal:Reflection> class ReflectionClass implements Reflector, String
     Method [ <internal:Reflection> public method getConstants ] {
 
       - Parameters [1] {
-        Parameter #0 [ <optional> int $filter = ReflectionClassConstant::IS_PUBLIC | ReflectionClassConstant::IS_PROTECTED | ReflectionClassConstant::IS_PRIVATE ]
+        Parameter #0 [ <optional> ?int $filter = null ]
       }
     }
 
     Method [ <internal:Reflection> public method getReflectionConstants ] {
 
       - Parameters [1] {
-        Parameter #0 [ <optional> int $filter = ReflectionClassConstant::IS_PUBLIC | ReflectionClassConstant::IS_PROTECTED | ReflectionClassConstant::IS_PRIVATE ]
+        Parameter #0 [ <optional> ?int $filter = null ]
       }
     }
 
@@ -233,6 +234,13 @@ Class [ <internal:Reflection> class ReflectionClass implements Reflector, String
       }
     }
 
+    Method [ <internal:Reflection> public method isEnum ] {
+
+      - Parameters [0] {
+      }
+      - Return [ bool ]
+    }
+
     Method [ <internal:Reflection> public method isAbstract ] {
 
       - Parameters [0] {
@@ -261,7 +269,7 @@ Class [ <internal:Reflection> class ReflectionClass implements Reflector, String
     Method [ <internal:Reflection> public method newInstance ] {
 
       - Parameters [1] {
-        Parameter #0 [ <optional> mixed ...$args = <default> ]
+        Parameter #0 [ <optional> mixed ...$args ]
       }
     }
 

@@ -2,10 +2,10 @@
    +----------------------------------------------------------------------+
    | Copyright (c) The PHP Group                                          |
    +----------------------------------------------------------------------+
-   | This source file is subject to version 3.01 of the PHP license,	  |
+   | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | http://www.php.net/license/3_01.txt                                  |
+   | https://www.php.net/license/3_01.txt                                 |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -127,12 +127,14 @@ const phpdbg_command_t phpdbg_watch_commands[] = {
 #define HT_WATCH_HT(watch) HT_PTR_HT((watch)->addr.ptr)
 
 /* ### PRINTING POINTER DIFFERENCES ### */
-zend_bool phpdbg_check_watch_diff(phpdbg_watchtype type, void *oldPtr, void *newPtr) {
+bool phpdbg_check_watch_diff(phpdbg_watchtype type, void *oldPtr, void *newPtr) {
 	switch (type) {
 		case WATCH_ON_BUCKET:
 			if (memcmp(&((Bucket *) oldPtr)->h, &((Bucket *) newPtr)->h, sizeof(Bucket) - sizeof(zval) /* key/val comparison */) != 0) {
 				return 2;
 			}
+			/* TODO: Is this intentional? */
+			ZEND_FALLTHROUGH;
 		case WATCH_ON_ZVAL:
 			return memcmp(oldPtr, newPtr, sizeof(zend_value) + sizeof(uint32_t) /* value + typeinfo */) != 0;
 		case WATCH_ON_HASHTABLE:
@@ -498,7 +500,7 @@ phpdbg_watch_element *phpdbg_add_ht_watch_element(zval *zv, phpdbg_watch_element
 	return phpdbg_add_watch_element(&watch, element);
 }
 
-zend_bool phpdbg_is_recursively_watched(void *ptr, phpdbg_watch_element *element) {
+bool phpdbg_is_recursively_watched(void *ptr, phpdbg_watch_element *element) {
 	phpdbg_watch_element *next = element;
 	do {
 		element = next;
@@ -663,7 +665,7 @@ void phpdbg_queue_element_for_recreation(phpdbg_watch_element *element) {
 	}
 }
 
-zend_bool phpdbg_try_readding_watch_element(zval *parent, phpdbg_watch_element *element) {
+bool phpdbg_try_re_adding_watch_element(zval *parent, phpdbg_watch_element *element) {
 	zval *zv;
 	HashTable *ht = HT_FROM_ZVP(parent);
 
@@ -688,7 +690,7 @@ zend_bool phpdbg_try_readding_watch_element(zval *parent, phpdbg_watch_element *
 				next = Z_REFVAL_P(next);
 			}
 
-			if (!phpdbg_try_readding_watch_element(next, element->child)) {
+			if (!phpdbg_try_re_adding_watch_element(next, element->child)) {
 				return 0;
 			}
 		} else if (phpdbg_check_watch_diff(WATCH_ON_ZVAL, &element->backup.zv, zv)) {
@@ -734,7 +736,7 @@ void phpdbg_dequeue_elements_for_recreation() {
 			} else {
 				ZVAL_ARR(zv, element->parent_container);
 			}
-			if (!phpdbg_try_readding_watch_element(zv, element)) {
+			if (!phpdbg_try_re_adding_watch_element(zv, element)) {
 				phpdbg_automatic_dequeue_free(element);
 			}
 		} else {
@@ -1262,7 +1264,7 @@ static int phpdbg_watchpoint_parse_wrapper(char *name, size_t namelen, char *key
 	return ret;
 }
 
-PHPDBG_API int phpdbg_watchpoint_parse_input(char *input, size_t len, HashTable *parent, size_t i, phpdbg_watch_parse_struct *info, zend_bool silent) {
+PHPDBG_API int phpdbg_watchpoint_parse_input(char *input, size_t len, HashTable *parent, size_t i, phpdbg_watch_parse_struct *info, bool silent) {
 	return phpdbg_parse_variable_with_arg(input, len, parent, i, (phpdbg_parse_var_with_arg_func) phpdbg_watchpoint_parse_wrapper, NULL, 0, info);
 }
 

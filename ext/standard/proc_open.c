@@ -5,7 +5,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | http://www.php.net/license/3_01.txt                                  |
+   | https://www.php.net/license/3_01.txt                                 |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -48,10 +48,16 @@
 # elif defined(__FreeBSD__)
 /* FreeBSD defines `openpty` in <libutil.h> */
 #  include <libutil.h>
-# elif defined(__NetBSD__)
-/* On recent NetBSD releases the emalloc, estrdup ... calls had been introduced in libutil */
-#  include <sys/termios.h>
+# elif defined(__NetBSD__) || defined(__DragonFly__)
+/* On recent NetBSD/DragonFlyBSD releases the emalloc, estrdup ... calls had been introduced in libutil */
+#  if defined(__NetBSD__)
+#    include <sys/termios.h>
+#  else
+#    include <termios.h>
+#  endif
 extern int openpty(int *, int *, char *, struct termios *, struct winsize *);
+# elif defined(__sun)
+#    include <termios.h>
 # else
 /* Mac OS X (and some BSDs) define `openpty` in <util.h> */
 #  include <util.h>
@@ -62,7 +68,7 @@ extern int openpty(int *, int *, char *, struct termios *, struct winsize *);
 # include <termios.h>
 # define HAVE_OPENPTY 1
 
-/* Solaris/Illumos does not have any openpty implementation */
+/* Solaris before version 11.4 and Illumos do not have any openpty implementation */
 int openpty(int *master, int *slave, char *name, struct termios *termp, struct winsize *winp)
 {
 	int fd, sd;
@@ -514,7 +520,7 @@ static char *create_win_command_from_args(HashTable *args)
 {
 	smart_string str = {0};
 	zval *arg_zv;
-	zend_bool is_prog_name = 1;
+	bool is_prog_name = 1;
 	int elem_num = 0;
 
 	ZEND_HASH_FOREACH_VAL(args, arg_zv) {
@@ -605,7 +611,7 @@ static int convert_command_to_use_shell(wchar_t **cmdw, size_t cmdw_len)
 #endif
 
 /* Convert command parameter array passed as first argument to `proc_open` into command string */
-static char* get_command_from_array(zval *array, char ***argv, int num_elems)
+static char* get_command_from_array(HashTable *array, char ***argv, int num_elems)
 {
 	zval *arg_zv;
 	char *command = NULL;
@@ -613,7 +619,7 @@ static char* get_command_from_array(zval *array, char ***argv, int num_elems)
 
 	*argv = safe_emalloc(sizeof(char *), num_elems + 1, 0);
 
-	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(array), arg_zv) {
+	ZEND_HASH_FOREACH_VAL(array, arg_zv) {
 		zend_string *arg_str = get_valid_arg_string(arg_zv, i + 1);
 		if (!arg_str) {
 			/* Terminate with NULL so exit_fail code knows how many entries to free */
@@ -992,7 +998,9 @@ static void efree_argv(char **argv)
 /* {{{ Execute a command, with specified files used for input/output */
 PHP_FUNCTION(proc_open)
 {
-	zval *command_zv, *descriptorspec, *pipes;       /* Mandatory arguments */
+	zend_string *command_str;
+	HashTable *command_ht;
+	zval *descriptorspec, *pipes;       /* Mandatory arguments */
 	char *cwd = NULL;                                /* Optional argument */
 	size_t cwd_len = 0;                              /* Optional argument */
 	zval *environment = NULL, *other_options = NULL; /* Optional arguments */
@@ -1028,7 +1036,7 @@ PHP_FUNCTION(proc_open)
 	php_process_handle *proc;
 
 	ZEND_PARSE_PARAMETERS_START(3, 6)
-		Z_PARAM_ZVAL(command_zv)
+		Z_PARAM_ARRAY_HT_OR_STR(command_ht, command_str)
 		Z_PARAM_ARRAY(descriptorspec)
 		Z_PARAM_ZVAL(pipes)
 		Z_PARAM_OPTIONAL
@@ -1039,8 +1047,8 @@ PHP_FUNCTION(proc_open)
 
 	memset(&env, 0, sizeof(env));
 
-	if (Z_TYPE_P(command_zv) == IS_ARRAY) {
-		uint32_t num_elems = zend_hash_num_elements(Z_ARRVAL_P(command_zv));
+	if (command_ht) {
+		uint32_t num_elems = zend_hash_num_elements(command_ht);
 		if (num_elems == 0) {
 			zend_argument_value_error(1, "must have at least one element");
 			RETURN_THROWS();
@@ -1049,19 +1057,18 @@ PHP_FUNCTION(proc_open)
 #ifdef PHP_WIN32
 		/* Automatically bypass shell if command is given as an array */
 		bypass_shell = 1;
-		command = create_win_command_from_args(Z_ARRVAL_P(command_zv));
+		command = create_win_command_from_args(command_ht);
 		if (!command) {
 			RETURN_FALSE;
 		}
 #else
-		command = get_command_from_array(command_zv, &argv, num_elems);
+		command = get_command_from_array(command_ht, &argv, num_elems);
 		if (command == NULL) {
 			goto exit_fail;
 		}
 #endif
 	} else {
-		convert_to_string(command_zv);
-		command = estrdup(Z_STRVAL_P(command_zv));
+		command = estrdup(ZSTR_VAL(command_str));
 	}
 
 #ifdef PHP_WIN32

@@ -6,14 +6,14 @@ Patrick Allaert <patrickallaert@php.net>
 --SKIPIF--
 <?php require_once('skipif.inc'); ?>
 <?php
-	if (!function_exists("ldap_set_rebind_proc")) {
-		die("skip ldap_set_rebind_proc() does not exist");
-	}
-	require "connect.inc";
-	$link = @fsockopen($host, $port);
-	if (!$link) {
-		die("skip no server listening");
-	}
+    if (!function_exists("ldap_set_rebind_proc")) {
+        die("skip ldap_set_rebind_proc() does not exist");
+    }
+    require "connect.inc";
+    $link = @fsockopen($host, $port);
+    if (!$link) {
+        die("skip no server listening");
+    }
 ?>
 --FILE--
 <?php
@@ -39,5 +39,5 @@ try {
     echo $error->getMessage(), "\n";
 }
 ?>
---EXPECTF--
-ldap_set_rebind_proc(): Argument #2 ($callback) must be a valid callback or null, string given
+--EXPECT--
+ldap_set_rebind_proc(): Argument #2 ($callback) must be a valid callback or null, function "rebind_proc_inexistent" not found or invalid function name

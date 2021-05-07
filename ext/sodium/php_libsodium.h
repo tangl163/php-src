@@ -5,7 +5,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | http://www.php.net/license/3_01.txt                                  |
+   | https://www.php.net/license/3_01.txt                                 |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -112,6 +112,9 @@ PHP_FUNCTION(sodium_crypto_sign_verify_detached);
 PHP_FUNCTION(sodium_crypto_stream);
 PHP_FUNCTION(sodium_crypto_stream_keygen);
 PHP_FUNCTION(sodium_crypto_stream_xor);
+PHP_FUNCTION(sodium_crypto_stream_xchacha20);
+PHP_FUNCTION(sodium_crypto_stream_xchacha20_keygen);
+PHP_FUNCTION(sodium_crypto_stream_xchacha20_xor);
 PHP_FUNCTION(sodium_hex2bin);
 PHP_FUNCTION(sodium_increment);
 PHP_FUNCTION(sodium_memcmp);

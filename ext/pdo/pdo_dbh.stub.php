@@ -1,10 +1,10 @@
 <?php
 
-/** @generate-function-entries */
+/** @generate-class-entries */
 
 class PDO
 {
-    public function __construct(string $dsn, ?string $username = null, ?string $passwd = null, ?array $options = null) {}
+    public function __construct(string $dsn, ?string $username = null, ?string $password = null, ?array $options = null) {}
 
     /** @return bool */
     public function beginTransaction() {}
@@ -34,19 +34,19 @@ class PDO
     public function lastInsertId(?string $name = null) {}
 
     /** @return PDOStatement|false */
-    public function prepare(string $statement, array $driver_options = []) {}
+    public function prepare(string $query, array $options = []) {}
 
     /** @return PDOStatement|false */
-    public function query(string $statement, ?int $fetch_mode = null, ...$fetch_mode_args) {}
+    public function query(string $query, ?int $fetchMode = null, mixed ...$fetchModeArgs) {}
 
     /** @return string|false */
-    public function quote(string $string, int $parameter_type = PDO::PARAM_STR) {}
+    public function quote(string $string, int $type = PDO::PARAM_STR) {}
 
     /** @return bool */
     public function rollBack() {}
 
     /**
-     * @param mixed $value
+     * @param array|int $value
      * @return bool
      */
     public function setAttribute(int $attribute, $value) {}

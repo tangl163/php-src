@@ -1,48 +1,48 @@
 <?php
 
-/** @generate-function-entries */
+/** @generate-class-entries */
 
-function use_soap_error_handler(bool $handler = true): bool {}
+function use_soap_error_handler(bool $enable = true): bool {}
 
-function is_soap_fault($object): bool {}
+function is_soap_fault(mixed $object): bool {}
 
 class SoapParam
 {
-    public function __construct($data, string $name) {}
+    public function __construct(mixed $data, string $name) {}
 }
 
 class SoapHeader
 {
-    public function __construct(string $namespace, string $name, $data = UNKNOWN, bool $mustunderstand = false, $actor = UNKNOWN) {}
+    public function __construct(string $namespace, string $name, mixed $data = UNKNOWN, bool $mustUnderstand = false, string|int|null $actor = null) {}
 }
 
 class SoapFault extends Exception
 {
-    public function __construct($faultcode, string $faultstring, ?string $faultactor = null, $detail = null, ?string $faultname = null, $headerfault = null) {}
+    public function __construct(array|string|null $code, string $string, ?string $actor = null, mixed $details = null, ?string $name = null, mixed $headerFault = null) {}
 
     public function __toString(): string {}
 }
 
 class SoapVar
 {
-    public function __construct($data, $encoding, string $type_name = "", string $type_namespace = "", string $node_name = "", string $node_namespace = "") {}
+    public function __construct(mixed $data, ?int $encoding, ?string $typeName = null, ?string $typeNamespace = null, ?string $nodeName = null, ?string $nodeNamespace = null) {}
 }
 
 class SoapServer
 {
-    public function __construct($wsdl, array $options = []) {}
+    public function __construct(?string $wsdl, array $options = []) {}
 
     /** @return void */
-    public function fault(string $code, string $string, string $actor = "", $details = null, string $name = "") {}
+    public function fault(string $code, string $string, string $actor = "", mixed $details = null, string $name = "") {}
 
     /** @return void */
-    public function addSoapHeader(SoapHeader $object) {}
+    public function addSoapHeader(SoapHeader $header) {}
 
     /** @return void */
     public function setPersistence(int $mode) {}
 
     /** @return void */
-    public function setClass(string $class_name, ...$argv) {}
+    public function setClass(string $class, mixed ...$args) {}
 
     /** @return void */
     public function setObject(object $object) {}
@@ -50,22 +50,29 @@ class SoapServer
     /** @return array */
     public function getFunctions() {}
 
-    /** @return void */
+    /**
+     * @param array|string|int $functions
+     * @return void
+     */
     public function addFunction($functions) {}
 
     /** @return void */
-    public function handle(string $soap_request = UNKNOWN) {}
+    public function handle(?string $request = null) {}
 }
 
 class SoapClient
 {
-    public function __construct($wsdl, array $options = []) {}
+    public function __construct(?string $wsdl, array $options = []) {}
 
     /** @return mixed */
-    public function __call(string $function_name, array $arguments) {}
+    public function __call(string $name, array $args) {}
 
-    /** @return mixed */
-    public function __soapCall(string $function_name, array $arguments, ?array $options = null, $input_headers = null, $output_headers = null) {}
+    /**
+     * @param SoapHeader|array|null $inputHeaders
+     * @param array $outputHeaders
+     * @return mixed
+     */
+    public function __soapCall(string $name, array $args, ?array $options = null, $inputHeaders = null, &$outputHeaders = null) {}
 
     /** @return array|null */
     public function __getFunctions() {}
@@ -86,7 +93,7 @@ class SoapClient
     public function __getLastResponseHeaders() {}
 
     /** @return string|null */
-    public function __doRequest(string $request, string $location, string $action, int $version, int $one_way = 0) {}
+    public function __doRequest(string $request, string $location, string $action, int $version, bool $oneWay = false) {}
 
     /** @return void */
     public function __setCookie(string $name, ?string $value = null) {}
@@ -94,9 +101,12 @@ class SoapClient
     /** @return array */
     public function __getCookies() {}
 
-    /** @return bool */
-    public function __setSoapHeaders($soapheaders = null) {}
+    /**
+     * @param SoapHeader|array|null $headers
+     * @return bool
+     */
+    public function __setSoapHeaders($headers = null) {}
 
     /** @return string|null */
-    public function __setLocation(string $new_location = "") {}
+    public function __setLocation(?string $location = null) {}
 }

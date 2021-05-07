@@ -1,9 +1,9 @@
 /* This is a generated file, edit the .stub.php file instead.
- * Stub hash: 9f811912b4a466a87477883abed02f998380481a */
+ * Stub hash: 23040d115ab2c1900fa537313f3a7ff4a57b9715 */
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_ResourceBundle___construct, 0, 0, 2)
 	ZEND_ARG_TYPE_INFO(0, locale, IS_STRING, 1)
-	ZEND_ARG_TYPE_INFO(0, bundlename, IS_STRING, 1)
+	ZEND_ARG_TYPE_INFO(0, bundle, IS_STRING, 1)
 	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, fallback, _IS_BOOL, 0, "true")
 ZEND_END_ARG_INFO()
 
@@ -18,7 +18,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_class_ResourceBundle_count, 0, 0, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_ResourceBundle_getLocales, 0, 0, 1)
-	ZEND_ARG_TYPE_INFO(0, bundlename, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, bundle, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 #define arginfo_class_ResourceBundle_getErrorCode arginfo_class_ResourceBundle_count
@@ -50,3 +50,14 @@ static const zend_function_entry class_ResourceBundle_methods[] = {
 	ZEND_ME(ResourceBundle, getIterator, arginfo_class_ResourceBundle_getIterator, ZEND_ACC_PUBLIC)
 	ZEND_FE_END
 };
+
+static zend_class_entry *register_class_ResourceBundle(zend_class_entry *class_entry_IteratorAggregate, zend_class_entry *class_entry_Countable)
+{
+	zend_class_entry ce, *class_entry;
+
+	INIT_CLASS_ENTRY(ce, "ResourceBundle", class_ResourceBundle_methods);
+	class_entry = zend_register_internal_class_ex(&ce, NULL);
+	zend_class_implements(class_entry, 2, class_entry_IteratorAggregate, class_entry_Countable);
+
+	return class_entry;
+}

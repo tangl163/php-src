@@ -5,7 +5,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | http://www.php.net/license/3_01.txt                                  |
+   | https://www.php.net/license/3_01.txt                                 |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -176,19 +176,18 @@ PHP_FUNCTION(pg_select);
 #define PGSQL_DML_ESCAPE            (1<<12)    /* No convert, but escape only */
 
 /* exported functions */
-PHP_PGSQL_API int php_pgsql_meta_data(PGconn *pg_link, const char *table_name, zval *meta, zend_bool extended);
-PHP_PGSQL_API int php_pgsql_convert(PGconn *pg_link, const char *table_name, const zval *values, zval *result, zend_ulong opt);
-PHP_PGSQL_API int php_pgsql_insert(PGconn *pg_link, const char *table, zval *values, zend_ulong opt, zend_string **sql);
-PHP_PGSQL_API int php_pgsql_update(PGconn *pg_link, const char *table, zval *values, zval *ids, zend_ulong opt , zend_string **sql);
-PHP_PGSQL_API int php_pgsql_delete(PGconn *pg_link, const char *table, zval *ids, zend_ulong opt, zend_string **sql);
-PHP_PGSQL_API int php_pgsql_select(PGconn *pg_link, const char *table, zval *ids, zval *ret_array, zend_ulong opt, long fetch_option, zend_string **sql );
-PHP_PGSQL_API int php_pgsql_result2array(PGresult *pg_result, zval *ret_array, long fetch_option);
+PHP_PGSQL_API zend_result php_pgsql_meta_data(PGconn *pg_link, const zend_string *table_name, zval *meta, bool extended);
+PHP_PGSQL_API zend_result php_pgsql_convert(PGconn *pg_link, const zend_string *table_name, const zval *values, zval *result, zend_ulong opt);
+PHP_PGSQL_API zend_result php_pgsql_insert(PGconn *pg_link, const zend_string *table, zval *values, zend_ulong opt, zend_string **sql);
+PHP_PGSQL_API zend_result php_pgsql_update(PGconn *pg_link, const zend_string *table, zval *values, zval *ids, zend_ulong opt , zend_string **sql);
+PHP_PGSQL_API zend_result php_pgsql_delete(PGconn *pg_link, const zend_string *table, zval *ids, zend_ulong opt, zend_string **sql);
+PHP_PGSQL_API zend_result php_pgsql_select(PGconn *pg_link, const zend_string *table, zval *ids, zval *ret_array, zend_ulong opt, long fetch_option, zend_string **sql );
+PHP_PGSQL_API void php_pgsql_result2array(PGresult *pg_result, zval *ret_array, long fetch_option);
 
 /* internal functions */
 static void php_pgsql_do_connect(INTERNAL_FUNCTION_PARAMETERS,int persistent);
 static void php_pgsql_get_link_info(INTERNAL_FUNCTION_PARAMETERS, int entry_type);
 static void php_pgsql_get_result_info(INTERNAL_FUNCTION_PARAMETERS, int entry_type);
-static char *get_field_name(PGconn *pgsql, Oid oid, HashTable *list);
 static void php_pgsql_get_field_info(INTERNAL_FUNCTION_PARAMETERS, int entry_type);
 static void php_pgsql_data_info(INTERNAL_FUNCTION_PARAMETERS, int entry_type);
 static void php_pgsql_do_async(INTERNAL_FUNCTION_PARAMETERS,int entry_type);
@@ -284,6 +283,8 @@ ZEND_BEGIN_MODULE_GLOBALS(pgsql)
 	HashTable notices;  /* notice message for each connection */
 	zend_resource *default_link; /* default link when connection is omitted */
 	HashTable hashes; /* hashes for each connection */
+	HashTable field_oids;
+	HashTable table_oids;
 ZEND_END_MODULE_GLOBALS(pgsql)
 
 ZEND_EXTERN_MODULE_GLOBALS(pgsql)

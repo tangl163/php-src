@@ -39,14 +39,13 @@ try {
 }
 
 var_dump(session_id(), $oldHandler, ini_get('session.save_handler'), $handler->i, $_SESSION);
+?>
 --EXPECTF--
 *** Testing session_set_save_handler() : incorrect arguments for existing handler open ***
 Open 
+SessionHandler::open() expects exactly 2 arguments, 0 given
 
-Warning: session_start(): Failed to initialize storage module: user (path: ) in %s on line %d
-SessionHandler::open() expects exactly 2 parameters, 0 given
-
-Warning: Undefined variable $_SESSION in %s on line %d
+Warning: Undefined global variable $_SESSION in %s on line %d
 string(0) ""
 string(5) "files"
 string(4) "user"

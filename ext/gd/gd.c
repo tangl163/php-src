@@ -5,7 +5,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | http://www.php.net/license/3_01.txt                                  |
+   | https://www.php.net/license/3_01.txt                                 |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -57,8 +57,6 @@
 
 #include "gd_compat.h"
 
-static int le_gd_font;
-
 #include <gd.h>
 #include <gd_errors.h>
 #include <gdfontt.h>  /* 1 Tiny font */
@@ -86,7 +84,7 @@ static int le_gd_font;
 #endif
 
 #ifdef HAVE_GD_FREETYPE
-static void php_imagettftext_common(INTERNAL_FUNCTION_PARAMETERS, int, int);
+static void php_imagettftext_common(INTERNAL_FUNCTION_PARAMETERS, int);
 #endif
 
 #include "gd_arginfo.h"
@@ -199,9 +197,9 @@ zend_object *php_gd_image_object_create(zend_class_entry *class_type)
 static void php_gd_image_object_free(zend_object *intern)
 {
 	php_gd_image_object *img_obj_ptr = php_gd_exgdimage_from_zobj_p(intern);
-	gdImageDestroy(img_obj_ptr->image);
-	img_obj_ptr->image = NULL;
-
+	if (img_obj_ptr->image) {
+		gdImageDestroy(img_obj_ptr->image);
+	}
 	zend_object_std_dtor(intern);
 }
 
@@ -219,10 +217,7 @@ void php_gd_assign_libgdimageptr_as_extgdimage(zval *val, gdImagePtr image)
 
 static void php_gd_object_minit_helper()
 {
-	zend_class_entry ce;
-	INIT_CLASS_ENTRY(ce, "GdImage", class_GdImage_methods);
-	gd_image_ce = zend_register_internal_class(&ce);
-	gd_image_ce->ce_flags |= ZEND_ACC_FINAL;
+	gd_image_ce = register_class_GdImage();
 	gd_image_ce->create_object = php_gd_image_object_create;
 	gd_image_ce->serialize = zend_class_serialize_deny;
 	gd_image_ce->unserialize = zend_class_unserialize_deny;
@@ -232,9 +227,76 @@ static void php_gd_object_minit_helper()
 	php_gd_image_object_handlers.clone_obj = NULL;
 	php_gd_image_object_handlers.free_obj = php_gd_image_object_free;
 	php_gd_image_object_handlers.get_constructor = php_gd_image_object_get_constructor;
+	php_gd_image_object_handlers.compare = zend_objects_not_comparable;
 	php_gd_image_object_handlers.offset = XtOffsetOf(php_gd_image_object, std);
 }
 
+static zend_class_entry *gd_font_ce = NULL;
+static zend_object_handlers php_gd_font_object_handlers;
+
+typedef struct _php_gd_font_object {
+	gdFontPtr font;
+	zend_object std;
+} php_gd_font_object;
+
+static php_gd_font_object *php_gd_font_object_from_zend_object(zend_object *zobj)
+{
+	return ((php_gd_font_object*)(zobj + 1)) - 1;
+}
+
+static zend_object *php_gd_font_object_to_zend_object(php_gd_font_object *obj)
+{
+	return ((zend_object*)(obj + 1)) - 1;
+}
+
+static zend_object *php_gd_font_object_create(zend_class_entry *ce)
+{
+	php_gd_font_object *obj = zend_object_alloc(sizeof(php_gd_font_object), ce);
+	zend_object *zobj = php_gd_font_object_to_zend_object(obj);
+
+	obj->font = NULL;
+	zend_object_std_init(zobj, ce);
+	object_properties_init(zobj, ce);
+	zobj->handlers = &php_gd_font_object_handlers;
+
+	return zobj;
+}
+
+static void php_gd_font_object_free(zend_object *zobj)
+{
+	php_gd_font_object *obj = php_gd_font_object_from_zend_object(zobj);
+
+	if (obj->font) {
+		if (obj->font->data) {
+			efree(obj->font->data);
+		}
+		efree(obj->font);
+		obj->font = NULL;
+	}
+
+	zend_object_std_dtor(zobj);
+}
+
+static zend_function *php_gd_font_object_get_constructor(zend_object *object)
+{
+	zend_throw_error(NULL, "You cannot initialize a GdFont object except through helper functions");
+	return NULL;
+}
+
+static void php_gd_font_minit_helper()
+{
+	gd_font_ce = register_class_GdFont();
+	gd_font_ce->create_object = php_gd_font_object_create;
+	gd_font_ce->serialize = zend_class_serialize_deny;
+	gd_font_ce->unserialize = zend_class_unserialize_deny;
+
+	/* setting up the object handlers for the GdFont class */
+	memcpy(&php_gd_font_object_handlers, &std_object_handlers, sizeof(zend_object_handlers));
+	php_gd_font_object_handlers.clone_obj = NULL;
+	php_gd_font_object_handlers.free_obj = php_gd_font_object_free;
+	php_gd_font_object_handlers.get_constructor = php_gd_font_object_get_constructor;
+	php_gd_font_object_handlers.offset = XtOffsetOf(php_gd_font_object, std);
+}
 
 /*********************************************************
  *
@@ -265,19 +327,6 @@ PHP_INI_BEGIN()
 PHP_INI_END()
 /* }}} */
 
-/* {{{ php_free_gd_font */
-static void php_free_gd_font(zend_resource *rsrc)
-{
-	gdFontPtr fp = (gdFontPtr) rsrc->ptr;
-
-	if (fp->data) {
-		efree(fp->data);
-	}
-
-	efree(fp);
-}
-/* }}} */
-
 /* {{{ php_gd_error_method */
 void php_gd_error_method(int type, const char *format, va_list args)
 {
@@ -302,8 +351,8 @@ void php_gd_error_method(int type, const char *format, va_list args)
 /* {{{ PHP_MINIT_FUNCTION */
 PHP_MINIT_FUNCTION(gd)
 {
-	le_gd_font = zend_register_list_destructors_ex(php_free_gd_font, NULL, "gd font", module_number);
 	php_gd_object_minit_helper();
+	php_gd_font_minit_helper();
 
 #if defined(HAVE_GD_FREETYPE) && defined(HAVE_GD_BUNDLED)
 	gdFontCacheMutexSetup();
@@ -614,7 +663,6 @@ PHP_FUNCTION(gd_info)
 /* {{{ Load a new font */
 PHP_FUNCTION(imageloadfont)
 {
-	zval *ind;
 	zend_string *file;
 	int hdr_size = sizeof(gdFont) - sizeof(char *);
 	int body_size, n = 0, b, i, body_size_check;
@@ -625,7 +673,7 @@ PHP_FUNCTION(imageloadfont)
 		RETURN_THROWS();
 	}
 
-	stream = php_stream_open_wrapper(ZSTR_VAL(file), "rb", IGNORE_PATH | IGNORE_URL_WIN | REPORT_ERRORS, NULL);
+	stream = php_stream_open_wrapper(ZSTR_VAL(file), "rb", IGNORE_PATH | REPORT_ERRORS, NULL);
 	if (stream == NULL) {
 		RETURN_FALSE;
 	}
@@ -704,13 +752,8 @@ PHP_FUNCTION(imageloadfont)
 	}
 	php_stream_close(stream);
 
-	ind = zend_list_insert(font, le_gd_font);
-
-	/* Adding 5 to the font index so we will never have font indices
-	 * that overlap with the old fonts (with indices 1-5).  The first
-	 * list index given out is always 1.
-	 */
-	RETURN_LONG(Z_RES_HANDLE_P(ind) + 5);
+	object_init_ex(return_value, gd_font_ce);
+	php_gd_font_object_from_zend_object(Z_OBJ_P(return_value))->font = font;
 }
 /* }}} */
 
@@ -800,7 +843,7 @@ PHP_FUNCTION(imageistruecolor)
 PHP_FUNCTION(imagetruecolortopalette)
 {
 	zval *IM;
-	zend_bool dither;
+	bool dither;
 	zend_long ncolors;
 	gdImagePtr im;
 
@@ -861,20 +904,20 @@ PHP_FUNCTION(imagecolormatch)
 	result = gdImageColorMatch(im1, im2);
 	switch (result) {
 		case -1:
-			php_error_docref(NULL, E_WARNING, "Image1 must be TrueColor" );
-			RETURN_FALSE;
+			zend_argument_value_error(1, "must be TrueColor");
+			RETURN_THROWS();
 			break;
 		case -2:
-			php_error_docref(NULL, E_WARNING, "Image2 must be Palette" );
-			RETURN_FALSE;
+			zend_argument_value_error(2, "must be Palette");
+			RETURN_THROWS();
 			break;
 		case -3:
-			php_error_docref(NULL, E_WARNING, "Image1 and Image2 must be the same size" );
-			RETURN_FALSE;
+			zend_argument_value_error(2, "must be the same size as argument #1 ($im1)");
+			RETURN_THROWS();
 			break;
 		case -4:
-			php_error_docref(NULL, E_WARNING, "Image2 must have at least one color" );
-			RETURN_FALSE;
+			zend_argument_value_error(2, "must have at least one color");
+			RETURN_THROWS();
 			break;
 	}
 
@@ -953,7 +996,7 @@ PHP_FUNCTION(imagefilledarc)
 PHP_FUNCTION(imagealphablending)
 {
 	zval *IM;
-	zend_bool blend;
+	bool blend;
 	gdImagePtr im;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "Ob", &IM, gd_image_ce, &blend) == FAILURE) {
@@ -972,7 +1015,7 @@ PHP_FUNCTION(imagealphablending)
 PHP_FUNCTION(imagesavealpha)
 {
 	zval *IM;
-	zend_bool save;
+	bool save;
 	gdImagePtr im;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "Ob", &IM, gd_image_ce, &save) == FAILURE) {
@@ -1140,7 +1183,7 @@ PHP_FUNCTION(imagecopyresampled)
 PHP_FUNCTION(imagegrabwindow)
 {
 	HWND window;
-	zend_long client_area = 0;
+	bool client_area = 0;
 	RECT rc = {0};
 	int Width, Height;
 	HDC		hdc;
@@ -1150,7 +1193,7 @@ PHP_FUNCTION(imagegrabwindow)
 	zend_long lwindow_handle;
 	gdImagePtr im = NULL;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "l|l", &lwindow_handle, &client_area) == FAILURE) {
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "l|b", &lwindow_handle, &client_area) == FAILURE) {
 		RETURN_THROWS();
 	}
 
@@ -1269,9 +1312,9 @@ PHP_FUNCTION(imagerotate)
 	gdImagePtr im_dst, im_src;
 	double degrees;
 	zend_long color;
-	zend_long ignoretransparent = 0;
+	bool ignoretransparent = 0;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "Odl|l", &SIM, gd_image_ce,  &degrees, &color, &ignoretransparent) == FAILURE) {
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "Odl|b", &SIM, gd_image_ce,  &degrees, &color, &ignoretransparent) == FAILURE) {
 		RETURN_THROWS();
 	}
 
@@ -1459,7 +1502,7 @@ gdImagePtr _php_image_create_from_string(zend_string *data, char *tn, gdImagePtr
 
 	im = (*ioctx_func_p)(io_ctx);
 	if (!im) {
-		php_error_docref(NULL, E_WARNING, "Passed data is not in '%s' format", tn);
+		php_error_docref(NULL, E_WARNING, "Passed data is not in \"%s\" format", tn);
 		io_ctx->gd_free(io_ctx);
 		return NULL;
 	}
@@ -1483,7 +1526,8 @@ PHP_FUNCTION(imagecreatefromstring)
 	}
 
 	if (ZSTR_LEN(data) < sizeof(sig)) {
-		php_error_docref(NULL, E_WARNING, "Empty string or invalid image");
+		/* Handle this the same way as an unknown image type. */
+		php_error_docref(NULL, E_WARNING, "Data is not in a recognized format");
 		RETURN_FALSE;
 	}
 
@@ -1584,7 +1628,7 @@ static void _php_image_create_from(INTERNAL_FUNCTION_PARAMETERS, int image_type,
 	}
 
 
-	stream = php_stream_open_wrapper(file, "rb", REPORT_ERRORS|IGNORE_PATH|IGNORE_URL_WIN, NULL);
+	stream = php_stream_open_wrapper(file, "rb", REPORT_ERRORS|IGNORE_PATH, NULL);
 	if (stream == NULL)	{
 		RETURN_FALSE;
 	}
@@ -1666,7 +1710,7 @@ static void _php_image_create_from(INTERNAL_FUNCTION_PARAMETERS, int image_type,
 		return;
 	}
 
-	php_error_docref(NULL, E_WARNING, "'%s' is not a valid %s file", file, tn);
+	php_error_docref(NULL, E_WARNING, "\"%s\" is not a valid %s file", file, tn);
 out_err:
 	php_stream_close(stream);
 	RETURN_FALSE;
@@ -1777,7 +1821,6 @@ static void _php_image_output(INTERNAL_FUNCTION_PARAMETERS, int image_type, char
 	char *file = NULL;
 	zend_long quality = 0, type = 0;
 	gdImagePtr im;
-	char *fn = NULL;
 	FILE *fp;
 	size_t file_len = 0;
 	int argc = ZEND_NUM_ARGS();
@@ -1785,28 +1828,35 @@ static void _php_image_output(INTERNAL_FUNCTION_PARAMETERS, int image_type, char
 
 	/* The quality parameter for gd2 stands for chunk size */
 
-	if (zend_parse_parameters(argc, "O|pll", &imgind, gd_image_ce, &file, &file_len, &quality, &type) == FAILURE) {
-		RETURN_THROWS();
+	switch (image_type) {
+		case PHP_GDIMG_TYPE_GD:
+			if (zend_parse_parameters(argc, "O|p!", &imgind, gd_image_ce, &file, &file_len) == FAILURE) {
+				RETURN_THROWS();
+			}
+			break;
+		case PHP_GDIMG_TYPE_GD2:
+			if (zend_parse_parameters(argc, "O|p!ll", &imgind, gd_image_ce, &file, &file_len, &quality, &type) == FAILURE) {
+				RETURN_THROWS();
+			}
+			break;
+		EMPTY_SWITCH_DEFAULT_CASE()
 	}
 
 	im = php_gd_libgdimageptr_from_zval_p(imgind);
 
-	if (argc > 1) {
-		fn = file;
-		if (argc >= 3) {
-			q = quality;
-			if (argc == 4) {
-				t = type;
-			}
+	if (argc >= 3) {
+		q = quality;
+		if (argc == 4) {
+			t = type;
 		}
 	}
 
-	if (argc >= 2 && file_len) {
-		PHP_GD_CHECK_OPEN_BASEDIR(fn, "Invalid filename");
+	if (file_len) {
+		PHP_GD_CHECK_OPEN_BASEDIR(file, "Invalid filename");
 
-		fp = VCWD_FOPEN(fn, "wb");
+		fp = VCWD_FOPEN(file, "wb");
 		if (!fp) {
-			php_error_docref(NULL, E_WARNING, "Unable to open '%s' for writing", fn);
+			php_error_docref(NULL, E_WARNING, "Unable to open \"%s\" for writing", file);
 			RETURN_FALSE;
 		}
 
@@ -1870,7 +1920,7 @@ PHP_FUNCTION(imagexbm)
 	char *file = NULL;
 	size_t file_len = 0;
 	zend_long foreground_color;
-	zend_bool foreground_color_is_null = 1;
+	bool foreground_color_is_null = 1;
 	gdImagePtr im;
 	int i;
 	gdIOCtx *ctx = NULL;
@@ -1883,7 +1933,7 @@ PHP_FUNCTION(imagexbm)
 	im = php_gd_libgdimageptr_from_zval_p(imgind);
 
 	if (file != NULL) {
-		stream = php_stream_open_wrapper(file, "wb", REPORT_ERRORS|IGNORE_PATH|IGNORE_URL_WIN, NULL);
+		stream = php_stream_open_wrapper(file, "wb", REPORT_ERRORS|IGNORE_PATH, NULL);
 		if (stream == NULL) {
 			RETURN_FALSE;
 		}
@@ -1956,7 +2006,7 @@ PHP_FUNCTION(imagewbmp)
 	gdIOCtx *ctx = NULL;
 	zval *to_zval = NULL;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "O|z!l!", &imgind, gd_image_ce, &to_zval, &foreground_color) == FAILURE) {
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "O|z!l!", &imgind, gd_image_ce, &to_zval, &foreground_color, &foreground_color_is_null) == FAILURE) {
 		RETURN_THROWS();
 	}
 
@@ -2008,7 +2058,7 @@ PHP_FUNCTION(imagegd2)
 PHP_FUNCTION(imagebmp)
 {
 	zval *imgind;
-	zend_bool compressed = 1;
+	bool compressed = 1;
 	gdImagePtr im;
 	gdIOCtx *ctx = NULL;
 	zval *to_zval = NULL;
@@ -2297,8 +2347,8 @@ PHP_FUNCTION(imagecolorsforindex)
 		add_assoc_long(return_value,"blue", gdImageBlue(im,col));
 		add_assoc_long(return_value,"alpha", gdImageAlpha(im,col));
 	} else {
-		php_error_docref(NULL, E_WARNING, "Color index %d out of range", col);
-		RETURN_FALSE;
+		zend_argument_value_error(2, "is out of range");
+		RETURN_THROWS();
 	}
 }
 /* }}} */
@@ -2558,7 +2608,7 @@ PHP_FUNCTION(imagecolortransparent)
 {
 	zval *IM;
 	zend_long COL = 0;
-	zend_bool COL_IS_NULL = 1;
+	bool COL_IS_NULL = 1;
 	gdImagePtr im;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "O|l!", &IM, gd_image_ce, &COL, &COL_IS_NULL) == FAILURE) {
@@ -2579,11 +2629,11 @@ PHP_FUNCTION(imagecolortransparent)
 PHP_FUNCTION(imageinterlace)
 {
 	zval *IM;
-	zend_long INT = 0;
-	zend_bool INT_IS_NULL = 1;
+	bool INT = 0;
+	bool INT_IS_NULL = 1;
 	gdImagePtr im;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "O|l!", &IM, gd_image_ce, &INT, &INT_IS_NULL) == FAILURE) {
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "O|b!", &IM, gd_image_ce, &INT, &INT_IS_NULL) == FAILURE) {
 		RETURN_THROWS();
 	}
 
@@ -2593,7 +2643,7 @@ PHP_FUNCTION(imageinterlace)
 		gdImageInterlace(im, INT);
 	}
 
-	RETURN_LONG(gdImageGetInterlaced(im));
+	RETURN_BOOL(gdImageGetInterlaced(im));
 }
 /* }}} */
 
@@ -2606,7 +2656,7 @@ static void php_imagepolygon(INTERNAL_FUNCTION_PARAMETERS, int filled)
 {
 	zval *IM, *POINTS;
 	zend_long NPOINTS, COL;
-	zend_bool COL_IS_NULL = 1;
+	bool COL_IS_NULL = 1;
 	zval *var = NULL;
 	gdImagePtr im;
 	gdPointPtr points;
@@ -2695,42 +2745,21 @@ PHP_FUNCTION(imagefilledpolygon)
 /* }}} */
 
 /* {{{ php_find_gd_font */
-static gdFontPtr php_find_gd_font(int size)
+static gdFontPtr php_find_gd_font(zend_object *font_obj, zend_long font_int)
 {
-	gdFontPtr font;
-
-	switch (size) {
-		case 1:
-			font = gdFontTiny;
-			break;
-		case 2:
-			font = gdFontSmall;
-			break;
-		case 3:
-			font = gdFontMediumBold;
-			break;
-		case 4:
-			font = gdFontLarge;
-			break;
-		case 5:
-			font = gdFontGiant;
-			break;
-		default: {
-			 zval *zv = zend_hash_index_find(&EG(regular_list), size - 5);
-			 if (!zv || (Z_RES_P(zv))->type != le_gd_font) {
-				 if (size < 1) {
-					 font = gdFontTiny;
-				 } else {
-					 font = gdFontGiant;
-				 }
-			 } else {
-				 font = (gdFontPtr)Z_RES_P(zv)->ptr;
-			 }
-		 }
-		 break;
+	if (font_obj) {
+		return php_gd_font_object_from_zend_object(font_obj)->font;
 	}
 
-	return font;
+	switch (font_int) {
+		case 1: return gdFontTiny;
+		case 2: return gdFontSmall;
+		case 3: return gdFontMediumBold;
+		case 4: return gdFontLarge;
+		case 5: return gdFontGiant;
+	}
+
+	return font_int < 1 ? gdFontTiny : gdFontGiant;
 }
 /* }}} */
 
@@ -2740,14 +2769,15 @@ static gdFontPtr php_find_gd_font(int size)
  */
 static void php_imagefontsize(INTERNAL_FUNCTION_PARAMETERS, int arg)
 {
-	zend_long SIZE;
+	zend_object *font_obj;
+	zend_long font_int;
 	gdFontPtr font;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "l", &SIZE) == FAILURE) {
-		RETURN_THROWS();
-	}
+	ZEND_PARSE_PARAMETERS_START(1, 1)
+		Z_PARAM_OBJ_OF_CLASS_OR_LONG(font_obj, gd_font_ce, font_int)
+	ZEND_PARSE_PARAMETERS_END();
 
-	font = php_find_gd_font(SIZE);
+	font = php_find_gd_font(font_obj, font_int);
 	RETURN_LONG(arg ? font->h : font->w);
 }
 /* }}} */
@@ -2801,17 +2831,24 @@ static void php_gdimagecharup(gdImagePtr im, gdFontPtr f, int x, int y, int c, i
 static void php_imagechar(INTERNAL_FUNCTION_PARAMETERS, int mode)
 {
 	zval *IM;
-	zend_long SIZE, X, Y, COL;
+	zend_long X, Y, COL;
 	char *C;
 	size_t C_len;
 	gdImagePtr im;
-	int ch = 0, col, x, y, size, i, l = 0;
+	int ch = 0, col, x, y, i, l = 0;
 	unsigned char *str = NULL;
+	zend_object *font_obj;
+	zend_long font_int;
 	gdFontPtr font;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "Olllsl", &IM, gd_image_ce, &SIZE, &X, &Y, &C, &C_len, &COL) == FAILURE) {
-		RETURN_THROWS();
-	}
+	ZEND_PARSE_PARAMETERS_START(6, 6)
+		Z_PARAM_OBJECT_OF_CLASS(IM, gd_image_ce)
+		Z_PARAM_OBJ_OF_CLASS_OR_LONG(font_obj, gd_font_ce, font_int)
+		Z_PARAM_LONG(X)
+		Z_PARAM_LONG(Y)
+		Z_PARAM_STRING(C, C_len)
+		Z_PARAM_LONG(COL)
+	ZEND_PARSE_PARAMETERS_END();
 
 	im = php_gd_libgdimageptr_from_zval_p(IM);
 
@@ -2826,9 +2863,8 @@ static void php_imagechar(INTERNAL_FUNCTION_PARAMETERS, int mode)
 
 	y = Y;
 	x = X;
-	size = SIZE;
 
-	font = php_find_gd_font(size);
+	font = php_find_gd_font(font_obj, font_int);
 
 	switch (mode) {
 		case 0:
@@ -3099,33 +3135,19 @@ PHP_FUNCTION(imagegetclip)
 /* {{{ Give the bounding box of a text using fonts via freetype2 */
 PHP_FUNCTION(imageftbbox)
 {
-	php_imagettftext_common(INTERNAL_FUNCTION_PARAM_PASSTHRU, TTFTEXT_BBOX, 1);
+	php_imagettftext_common(INTERNAL_FUNCTION_PARAM_PASSTHRU, TTFTEXT_BBOX);
 }
 /* }}} */
 
 /* {{{ Write text to the image using fonts via freetype2 */
 PHP_FUNCTION(imagefttext)
 {
-	php_imagettftext_common(INTERNAL_FUNCTION_PARAM_PASSTHRU, TTFTEXT_DRAW, 1);
-}
-/* }}} */
-
-/* {{{ Give the bounding box of a text using TrueType fonts */
-PHP_FUNCTION(imagettfbbox)
-{
-	php_imagettftext_common(INTERNAL_FUNCTION_PARAM_PASSTHRU, TTFTEXT_BBOX, 0);
-}
-/* }}} */
-
-/* {{{ Write text to the image using a TrueType font */
-PHP_FUNCTION(imagettftext)
-{
-	php_imagettftext_common(INTERNAL_FUNCTION_PARAM_PASSTHRU, TTFTEXT_DRAW, 0);
+	php_imagettftext_common(INTERNAL_FUNCTION_PARAM_PASSTHRU, TTFTEXT_DRAW);
 }
 /* }}} */
 
 /* {{{ php_imagettftext_common */
-static void php_imagettftext_common(INTERNAL_FUNCTION_PARAMETERS, int mode, int extended)
+static void php_imagettftext_common(INTERNAL_FUNCTION_PARAMETERS, int mode)
 {
 	zval *IM, *EXT = NULL;
 	gdImagePtr im=NULL;
@@ -3135,19 +3157,14 @@ static void php_imagettftext_common(INTERNAL_FUNCTION_PARAMETERS, int mode, int 
 	double ptsize, angle;
 	char *str = NULL, *fontname = NULL;
 	char *error = NULL;
-	int argc = ZEND_NUM_ARGS();
 	gdFTStringExtra strex = {0};
 
 	if (mode == TTFTEXT_BBOX) {
-		if (argc < 4 || argc > ((extended) ? 5 : 4)) {
-			ZEND_WRONG_PARAM_COUNT();
-		} else if (zend_parse_parameters(argc, "ddss|a", &ptsize, &angle, &fontname, &fontname_len, &str, &str_len, &EXT) == FAILURE) {
+		if (zend_parse_parameters(ZEND_NUM_ARGS(), "ddss|a", &ptsize, &angle, &fontname, &fontname_len, &str, &str_len, &EXT) == FAILURE) {
 			RETURN_THROWS();
 		}
 	} else {
-		if (argc < 8 || argc > ((extended) ? 9 : 8)) {
-			ZEND_WRONG_PARAM_COUNT();
-		} else if (zend_parse_parameters(argc, "Oddlllss|a", &IM, gd_image_ce, &ptsize, &angle, &x, &y, &col, &fontname, &fontname_len, &str, &str_len, &EXT) == FAILURE) {
+		if (zend_parse_parameters(ZEND_NUM_ARGS(), "Oddlllss|a", &IM, gd_image_ce, &ptsize, &angle, &x, &y, &col, &fontname, &fontname_len, &str, &str_len, &EXT) == FAILURE) {
 			RETURN_THROWS();
 		}
 		im = php_gd_libgdimageptr_from_zval_p(IM);
@@ -3156,7 +3173,7 @@ static void php_imagettftext_common(INTERNAL_FUNCTION_PARAMETERS, int mode, int 
 	/* convert angle to radians */
 	angle = angle * (M_PI/180);
 
-	if (extended && EXT) {	/* parse extended info */
+	if (EXT) {	/* parse extended info */
 		zval *item;
 		zend_string *key;
 
@@ -3165,7 +3182,7 @@ static void php_imagettftext_common(INTERNAL_FUNCTION_PARAMETERS, int mode, int 
 			if (key == NULL) {
 				continue;
 			}
-			if (strcmp("linespacing", ZSTR_VAL(key)) == 0) {
+			if (zend_string_equals_literal(key, "linespacing")) {
 				strex.flags |= gdFTEX_LINESPACE;
 				strex.linespacing = zval_get_double(item);
 			}
@@ -3184,7 +3201,7 @@ static void php_imagettftext_common(INTERNAL_FUNCTION_PARAMETERS, int mode, int 
 
 	PHP_GD_CHECK_OPEN_BASEDIR(fontname, "Invalid font filename");
 
-	if (extended) {
+	if (EXT) {
 		error = gdImageStringFTEx(im, brect, col, fontname, ptsize, angle, x, y, str, &strex);
 	} else {
 		error = gdImageStringFT(im, brect, col, fontname, ptsize, angle, x, y, str);
@@ -3374,7 +3391,7 @@ static void php_image_filter_pixelate(INTERNAL_FUNCTION_PARAMETERS)
 	zval *IM;
 	gdImagePtr im;
 	zend_long tmp, blocksize;
-	zend_bool mode = 0;
+	bool mode = 0;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "Oll|b", &IM, gd_image_ce, &tmp, &blocksize, &mode) == FAILURE) {
 		RETURN_THROWS();
@@ -3540,7 +3557,7 @@ PHP_FUNCTION(imageflip)
 			break;
 
 		default:
-			zend_argument_value_error(2, "must be either IMG_FLIP_VERTICAL, IMG_FLIP_HORIZONTAL, or IMG_FLIP_BOTH");
+			zend_argument_value_error(2, "must be one of IMG_FLIP_VERTICAL, IMG_FLIP_HORIZONTAL, or IMG_FLIP_BOTH");
 			RETURN_THROWS();
 	}
 
@@ -3552,7 +3569,7 @@ PHP_FUNCTION(imageflip)
 PHP_FUNCTION(imageantialias)
 {
 	zval *IM;
-	zend_bool alias;
+	bool alias;
 	gdImagePtr im;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "Ob", &IM, gd_image_ce, &alias) == FAILURE) {
@@ -3819,7 +3836,7 @@ PHP_FUNCTION(imageaffinematrixget)
 	zval *tmp;
 	int res = GD_FALSE, i;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "l|z", &type, &options) == FAILURE)  {
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "lz", &type, &options) == FAILURE)  {
 		RETURN_THROWS();
 	}
 
@@ -3827,7 +3844,7 @@ PHP_FUNCTION(imageaffinematrixget)
 		case GD_AFFINE_TRANSLATE:
 		case GD_AFFINE_SCALE: {
 			double x, y;
-			if (!options || Z_TYPE_P(options) != IS_ARRAY) {
+			if (Z_TYPE_P(options) != IS_ARRAY) {
 				zend_argument_type_error(1, "must be of type array when using translate or scale");
 				RETURN_THROWS();
 			}
@@ -3858,11 +3875,6 @@ PHP_FUNCTION(imageaffinematrixget)
 		case GD_AFFINE_SHEAR_HORIZONTAL:
 		case GD_AFFINE_SHEAR_VERTICAL: {
 			double angle;
-
-			if (!options) {
-				zend_argument_type_error(2, "must be of type int|float when using rotate or shear");
-				RETURN_THROWS();
-			}
 
 			angle = zval_get_double(options);
 
@@ -4008,7 +4020,7 @@ PHP_FUNCTION(imageresolution)
 	zval *IM;
 	gdImagePtr im;
 	zend_long res_x, res_y;
-	zend_bool res_x_is_null = 1, res_y_is_null = 1;
+	bool res_x_is_null = 1, res_y_is_null = 1;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "O|l!l!", &IM, gd_image_ce, &res_x, &res_x_is_null, &res_y, &res_y_is_null) == FAILURE)  {
 		RETURN_THROWS();
@@ -4116,7 +4128,7 @@ static gdIOCtx *create_stream_context_from_zval(zval *to_zval) {
 			return NULL;
 		}
 
-		stream = php_stream_open_wrapper(Z_STRVAL_P(to_zval), "wb", REPORT_ERRORS|IGNORE_PATH|IGNORE_URL_WIN, NULL);
+		stream = php_stream_open_wrapper(Z_STRVAL_P(to_zval), "wb", REPORT_ERRORS|IGNORE_PATH, NULL);
 		if (stream == NULL) {
 			return NULL;
 		}

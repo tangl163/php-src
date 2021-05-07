@@ -5,7 +5,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | http://www.php.net/license/3_01.txt                                  |
+   | https://www.php.net/license/3_01.txt                                 |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -428,6 +428,7 @@ PHP_RINIT_FUNCTION(pcntl)
 	zend_hash_init(&PCNTL_G(php_signal_table), 16, NULL, ZVAL_PTR_DTOR, 0);
 	PCNTL_G(head) = PCNTL_G(tail) = PCNTL_G(spares) = NULL;
 	PCNTL_G(async_signals) = 0;
+	PCNTL_G(last_error) = 0;
 	return SUCCESS;
 }
 
@@ -784,7 +785,7 @@ PHP_FUNCTION(pcntl_exec)
 	int envc = 0, envi = 0;
 	char **argv = NULL, **envp = NULL;
 	char **current_arg, **pair;
-	int pair_length;
+	size_t pair_length;
 	zend_string *key;
 	char *path;
 	size_t path_len;
@@ -844,8 +845,9 @@ PHP_FUNCTION(pcntl_exec)
 			}
 
 			/* Length of element + equal sign + length of key + null */
+			ZEND_ASSERT(Z_STRLEN_P(element) < SIZE_MAX && ZSTR_LEN(key) < SIZE_MAX);
+			*pair = safe_emalloc(Z_STRLEN_P(element) + 1, sizeof(char), ZSTR_LEN(key) + 1);
 			pair_length = Z_STRLEN_P(element) + ZSTR_LEN(key) + 2;
-			*pair = emalloc(pair_length);
 			strlcpy(*pair, ZSTR_VAL(key), ZSTR_LEN(key) + 1);
 			strlcat(*pair, "=", pair_length);
 			strlcat(*pair, Z_STRVAL_P(element), pair_length);
@@ -884,17 +886,22 @@ PHP_FUNCTION(pcntl_signal)
 {
 	zval *handle;
 	zend_long signo;
-	zend_bool restart_syscalls = 1;
-	zend_bool restart_syscalls_is_null = 1;
+	bool restart_syscalls = 1;
+	bool restart_syscalls_is_null = 1;
 	char *error = NULL;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "lz|b!", &signo, &handle, &restart_syscalls, &restart_syscalls_is_null) == FAILURE) {
 		RETURN_THROWS();
 	}
 
-	if (signo < 1 || signo >= NSIG) {
-		php_error_docref(NULL, E_WARNING, "Invalid signal");
-		RETURN_FALSE;
+	if (signo < 1) {
+		zend_argument_value_error(1, "must be greater than or equal to 1");
+		RETURN_THROWS();
+	}
+
+	if (signo >= NSIG) {
+		zend_argument_value_error(1, "must be less than %d", NSIG);
+		RETURN_THROWS();
 	}
 
 	if (!PCNTL_G(spares)) {
@@ -920,8 +927,8 @@ PHP_FUNCTION(pcntl_signal)
 	/* Special long value case for SIG_DFL and SIG_IGN */
 	if (Z_TYPE_P(handle) == IS_LONG) {
 		if (Z_LVAL_P(handle) != (zend_long) SIG_DFL && Z_LVAL_P(handle) != (zend_long) SIG_IGN) {
-			php_error_docref(NULL, E_WARNING, "Invalid value for handle argument specified");
-			RETURN_FALSE;
+			zend_argument_value_error(2, "must be either SIG_DFL or SIG_IGN when an integer value is given");
+			RETURN_THROWS();
 		}
 		if (php_signal(signo, (Sigfunc *) Z_LVAL_P(handle), (int) restart_syscalls) == (void *)SIG_ERR) {
 			PCNTL_G(last_error) = errno;
@@ -935,10 +942,11 @@ PHP_FUNCTION(pcntl_signal)
 	if (!zend_is_callable_ex(handle, NULL, 0, NULL, NULL, &error)) {
 		zend_string *func_name = zend_get_callable_name(handle);
 		PCNTL_G(last_error) = EINVAL;
-		php_error_docref(NULL, E_WARNING, "Specified handler \"%s\" is not callable (%s)", ZSTR_VAL(func_name), error);
+
+		zend_argument_type_error(2, "must be of type callable|int, %s given", zend_zval_type_name(handle));
 		zend_string_release_ex(func_name, 0);
 		efree(error);
-		RETURN_FALSE;
+		RETURN_THROWS();
 	}
 	ZEND_ASSERT(!error);
 
@@ -966,8 +974,8 @@ PHP_FUNCTION(pcntl_signal_get_handler)
 	}
 
 	if (signo < 1 || signo > 32) {
-		php_error_docref(NULL, E_WARNING, "Invalid signal");
-		RETURN_FALSE;
+		zend_argument_value_error(1, "must be between 1 and 32");
+		RETURN_THROWS();
 	}
 
 	if ((prev_handle = zend_hash_index_find(&PCNTL_G(php_signal_table), signo)) != NULL) {
@@ -1178,10 +1186,10 @@ PHP_FUNCTION(pcntl_getpriority)
 {
 	zend_long who = PRIO_PROCESS;
 	zend_long pid;
-	zend_bool pid_is_null = 1;
+	bool pid_is_null = 1;
 	int pri;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "|l!l", &pid, &who) == FAILURE) {
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "|l!l", &pid, &pid_is_null, &who) == FAILURE) {
 		RETURN_THROWS();
 	}
 
@@ -1197,8 +1205,8 @@ PHP_FUNCTION(pcntl_getpriority)
 				php_error_docref(NULL, E_WARNING, "Error %d: No process was located using the given parameters", errno);
 				break;
 			case EINVAL:
-				php_error_docref(NULL, E_WARNING, "Error %d: Invalid identifier flag", errno);
-				break;
+				zend_argument_value_error(2, "must be one of PRIO_PGRP, PRIO_USER, or PRIO_PROCESS");
+				RETURN_THROWS();
 			default:
 				php_error_docref(NULL, E_WARNING, "Unknown error %d has occurred", errno);
 				break;
@@ -1217,10 +1225,10 @@ PHP_FUNCTION(pcntl_setpriority)
 {
 	zend_long who = PRIO_PROCESS;
 	zend_long pid;
-	zend_bool pid_is_null = 1;
+	bool pid_is_null = 1;
 	zend_long pri;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "l|l!l", &pri, &pid, &who) == FAILURE) {
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "l|l!l", &pri, &pid, &pid_is_null, &who) == FAILURE) {
 		RETURN_THROWS();
 	}
 
@@ -1231,8 +1239,8 @@ PHP_FUNCTION(pcntl_setpriority)
 				php_error_docref(NULL, E_WARNING, "Error %d: No process was located using the given parameters", errno);
 				break;
 			case EINVAL:
-				php_error_docref(NULL, E_WARNING, "Error %d: Invalid identifier flag", errno);
-				break;
+				zend_argument_value_error(3, "must be one of PRIO_PGRP, PRIO_USER, or PRIO_PROCESS");
+				RETURN_THROWS();
 			case EPERM:
 				php_error_docref(NULL, E_WARNING, "Error %d: A process was located, but neither its effective nor real user ID matched the effective user ID of the caller", errno);
 				break;
@@ -1380,7 +1388,7 @@ void pcntl_signal_dispatch()
 /* {{{ Enable/disable asynchronous signal handling and return the old setting. */
 PHP_FUNCTION(pcntl_async_signals)
 {
-	zend_bool on, on_is_null = 1;
+	bool on, on_is_null = 1;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "|b!", &on, &on_is_null) == FAILURE) {
 		RETURN_THROWS();
@@ -1400,19 +1408,18 @@ PHP_FUNCTION(pcntl_async_signals)
 PHP_FUNCTION(pcntl_unshare)
 {
 	zend_long flags;
-	int ret;
 
 	ZEND_PARSE_PARAMETERS_START(1, 1)
 		Z_PARAM_LONG(flags)
 	ZEND_PARSE_PARAMETERS_END();
 
-	ret = unshare(flags);
-	if (ret == -1) {
+	if (unshare(flags) == -1) {
 		PCNTL_G(last_error) = errno;
 		switch (errno) {
 #ifdef EINVAL
 			case EINVAL:
-				php_error_docref(NULL, E_WARNING, "Error %d: Invalid flag specified", errno);
+				zend_argument_value_error(1, "must be a combination of CLONE_* flags");
+				RETURN_THROWS();
 				break;
 #endif
 #ifdef ENOMEM

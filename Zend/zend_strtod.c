@@ -1563,7 +1563,7 @@ hexdig_init(void)	/* Use of hexdig_init omitted 20121220 to avoid a */
 	htinit(hexdig, USC "ABCDEF", 0x10 + 10);
 	}
 #else
-static unsigned char hexdig[256] = {
+static const unsigned char hexdig[256] = {
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -1911,7 +1911,7 @@ gethex( CONST char **sp, U *rvp, int rounding, int sign)
 		switch(*++s) {
 		  case '-':
 			esign = 1;
-			/* no break */
+			ZEND_FALLTHROUGH;
 		  case '+':
 			s++;
 		  }
@@ -2578,11 +2578,11 @@ zend_strtod
 	for(s = s00;;s++) switch(*s) {
 		case '-':
 			sign = 1;
-			/* no break */
+			ZEND_FALLTHROUGH;
 		case '+':
 			if (*++s)
 				goto break2;
-			/* no break */
+			ZEND_FALLTHROUGH;
 		case 0:
 			goto ret0;
 		case '\t':
@@ -2698,6 +2698,7 @@ zend_strtod
 		switch(c = *++s) {
 			case '-':
 				esign = 1;
+				ZEND_FALLTHROUGH;
 			case '+':
 				c = *++s;
 			}
@@ -3952,7 +3953,7 @@ zend_dtoa
 			break;
 		case 2:
 			leftright = 0;
-			/* no break */
+			ZEND_FALLTHROUGH;
 		case 4:
 			if (ndigits <= 0)
 				ndigits = 1;
@@ -3960,7 +3961,7 @@ zend_dtoa
 			break;
 		case 3:
 			leftright = 0;
-			/* no break */
+			ZEND_FALLTHROUGH;
 		case 5:
 			i = ndigits + k + 1;
 			ilim = i;
@@ -4213,7 +4214,7 @@ zend_dtoa
 	 *
 	 * Perhaps we should just compute leading 28 bits of S once
 	 * and for all and pass them and a shift to quorem, so it
-	 * can do shifts and ors to compute the numerator for q.
+	 * can do shifts and ORs to compute the numerator for q.
 	 */
 	i = dshift(S, s2);
 	b2 += i;
@@ -4466,9 +4467,6 @@ ZEND_API double zend_oct_strtod(const char *str, const char **endptr)
 		}
 		return 0.0;
 	}
-
-	/* skip leading zero */
-	s++;
 
 	while ((c = *s++)) {
 		if (c < '0' || c > '7') {

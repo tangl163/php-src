@@ -7,12 +7,12 @@ require_once('skipifconnectfailure.inc');
 
 $link = mysqli_init();
 if (!my_mysqli_real_connect($link, $host, $user, $passwd, $db, $port, $socket)) {
-	die(sprintf("skip Connect failed, [%d] %s\n", mysqli_connect_errno(), mysqli_connect_error()));
+    die(sprintf("skip Connect failed, [%d] %s\n", mysqli_connect_errno(), mysqli_connect_error()));
 }
 
 require_once('local_infile_tools.inc');
 if ($msg = check_local_infile_support($link, $engine))
-	die(sprintf("skip %s, [%d] %s", $msg, $link->errno, $link->error));
+    die(sprintf("skip %s, [%d] %s", $msg, $link->errno, $link->error));
 
 ?>
 --INI--
@@ -55,6 +55,5 @@ $link->close();
 unlink('bug77956.data');
 ?>
 --EXPECTF--
-Warning: mysqli::query(): LOAD DATA LOCAL INFILE forbidden in %s on line %d
-[006] [2000] LOAD DATA LOCAL INFILE is forbidden, check mysqli.allow_local_infile
+[006] [2000] LOAD DATA LOCAL INFILE is forbidden, check related settings like mysqli.allow_local_infile|mysqli.local_infile_directory or PDO::MYSQL_ATTR_LOCAL_INFILE|PDO::MYSQL_ATTR_LOCAL_INFILE_DIRECTORY
 done

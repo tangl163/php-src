@@ -5,7 +5,7 @@ date.timezone=Atlantic/Azores
 --SKIPIF--
 <?php
 if (!extension_loaded('intl'))
-	die('skip intl extension not enabled');
+    die('skip intl extension not enabled');
 --FILE--
 <?php
 
@@ -22,6 +22,7 @@ try {
 } catch (\TypeError $e) {
     echo $e->getMessage() . \PHP_EOL;
 }
+?>
 --EXPECTF--
 IntlCalendar::roll(): Argument #1 ($field) must be a valid field
 intlcal_roll(): Argument #1 ($calendar) must be of type IntlCalendar, int given

@@ -1,7 +1,7 @@
 --TEST--
 Bug #69085 (SoapClient's __call() type confusion through unserialize())
---SKIPIF--
-<?php require_once('skipif.inc'); ?>
+--EXTENSIONS--
+soap
 --INI--
 soap.wsdl_cache_enabled=0
 --FILE--
@@ -13,5 +13,6 @@ try {
 } catch (Exception $e) {
     echo "okey";
 }
+?>
 --EXPECT--
 okey

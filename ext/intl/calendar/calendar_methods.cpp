@@ -3,7 +3,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | http://www.php.net/license/3_01.txt                                  |
+   | https://www.php.net/license/3_01.txt                                 |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -16,7 +16,6 @@
 #include "config.h"
 #endif
 
-#define __STDC_FORMAT_MACROS
 #include <inttypes.h>
 
 #include "../intl_cppshims.h"
@@ -166,7 +165,7 @@ U_CFUNC PHP_FUNCTION(intlcal_get_keyword_values_for_locale)
 				*locale;
 	size_t			key_len,
 				locale_len;
-	zend_bool	commonly_used;
+	bool	commonly_used;
 	intl_error_reset(NULL);
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "ssb",
@@ -441,7 +440,7 @@ U_CFUNC PHP_FUNCTION(intlcal_roll)
 U_CFUNC PHP_FUNCTION(intlcal_clear)
 {
 	zend_long field;
-	zend_bool field_is_null = 1;
+	bool field_is_null = 1;
 	CALENDAR_METHOD_INIT_VARS;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(),
@@ -758,7 +757,7 @@ U_CFUNC PHP_FUNCTION(intlcal_is_set)
 U_CFUNC PHP_FUNCTION(intlcal_is_weekend)
 {
 	double date;
-	zend_bool date_is_null = 1;
+	bool date_is_null = 1;
 	CALENDAR_METHOD_INIT_VARS;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(),
@@ -800,7 +799,7 @@ U_CFUNC PHP_FUNCTION(intlcal_set_first_day_of_week)
 
 U_CFUNC PHP_FUNCTION(intlcal_set_lenient)
 {
-	zend_bool is_lenient;
+	bool is_lenient;
 	CALENDAR_METHOD_INIT_VARS;
 
 	if (zend_parse_method_parameters(ZEND_NUM_ARGS(), getThis(),
@@ -942,38 +941,35 @@ U_CFUNC PHP_FUNCTION(intlcal_set_skipped_wall_time_option)
 
 U_CFUNC PHP_FUNCTION(intlcal_from_date_time)
 {
-	zval			*zv_arg,
-					zv_tmp,
-					*zv_datetime  		= NULL,
-					zv_timestamp;
+	zend_object     *date_obj;
+	zend_string     *date_str;
+	zval			zv_tmp, zv_arg, zv_timestamp;
 	php_date_obj	*datetime;
-	char			*locale_str			= NULL;
+	char			*locale_str = NULL;
 	size_t				locale_str_len;
 	TimeZone		*timeZone;
-	UErrorCode		status				= U_ZERO_ERROR;
+	UErrorCode		status = U_ZERO_ERROR;
 	Calendar        *cal;
 	intl_error_reset(NULL);
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "z|s!",
-			&zv_arg, &locale_str, &locale_str_len) == FAILURE) {
-		RETURN_THROWS();
-	}
+	ZEND_PARSE_PARAMETERS_START(1, 2)
+		Z_PARAM_OBJ_OF_CLASS_OR_STR(date_obj, php_date_get_date_ce(), date_str)
+		Z_PARAM_OPTIONAL
+		Z_PARAM_STRING_OR_NULL(locale_str, locale_str_len)
+	ZEND_PARSE_PARAMETERS_END();
 
-	if (!(Z_TYPE_P(zv_arg) == IS_OBJECT && instanceof_function(
-			Z_OBJCE_P(zv_arg), php_date_get_date_ce()))) {
+	if (date_str) {
 		object_init_ex(&zv_tmp, php_date_get_date_ce());
-		zend_call_known_instance_method_with_1_params(
-			Z_OBJCE(zv_tmp)->constructor, Z_OBJ(zv_tmp), NULL, zv_arg);
-		zv_datetime = &zv_tmp;
+		ZVAL_STR(&zv_arg, date_str);
+		zend_call_known_instance_method_with_1_params(Z_OBJCE(zv_tmp)->constructor, Z_OBJ(zv_tmp), NULL, &zv_arg);
+		date_obj = Z_OBJ(zv_tmp);
 		if (EG(exception)) {
 			zend_object_store_ctor_failed(Z_OBJ(zv_tmp));
 			goto error;
 		}
-	} else {
-		zv_datetime = zv_arg;
 	}
 
-	datetime = Z_PHPDATE_P(zv_datetime);
+	datetime = php_date_obj_from_obj(date_obj);
 	if (!datetime->time) {
 		intl_error_set(NULL, U_ILLEGAL_ARGUMENT_ERROR,
 			"intlcal_from_date_time: DateTime object is unconstructed",
@@ -981,7 +977,7 @@ U_CFUNC PHP_FUNCTION(intlcal_from_date_time)
 		goto error;
 	}
 
-	zend_call_method_with_0_params(Z_OBJ_P(zv_datetime), php_date_get_date_ce(), NULL, "gettimestamp", &zv_timestamp);
+	zend_call_method_with_0_params(date_obj, php_date_get_date_ce(), NULL, "gettimestamp", &zv_timestamp);
 	if (Z_TYPE(zv_timestamp) != IS_LONG) {
 		intl_error_set(NULL, U_ILLEGAL_ARGUMENT_ERROR,
 			"intlcal_from_date_time: bad DateTime; call to "
@@ -1024,8 +1020,8 @@ U_CFUNC PHP_FUNCTION(intlcal_from_date_time)
 	calendar_object_create(return_value, cal);
 
 error:
-	if (zv_datetime && zv_datetime != zv_arg) {
-		zval_ptr_dtor(zv_datetime);
+	if (date_str) {
+		OBJ_RELEASE(date_obj);
 	}
 }
 

@@ -1,5 +1,5 @@
 /* This is a generated file, edit the .stub.php file instead.
- * Stub hash: 6d010c8797cbf11f12f13ce37eb8b36633bdbafb */
+ * Stub hash: 6b873a68045fb5cf75e23991a3c77aa01a8893ee */
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_Locale_getDefault, 0, 0, 0)
 ZEND_END_ARG_INFO()
@@ -18,7 +18,7 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_Locale_getDisplayScript, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, locale, IS_STRING, 0)
-	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, in_locale, IS_STRING, 1, "null")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, displayLocale, IS_STRING, 1, "null")
 ZEND_END_ARG_INFO()
 
 #define arginfo_class_Locale_getDisplayRegion arginfo_class_Locale_getDisplayScript
@@ -38,16 +38,16 @@ ZEND_END_ARG_INFO()
 #define arginfo_class_Locale_getAllVariants arginfo_class_Locale_setDefault
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_Locale_filterMatches, 0, 0, 2)
-	ZEND_ARG_TYPE_INFO(0, langtag, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, languageTag, IS_STRING, 0)
 	ZEND_ARG_TYPE_INFO(0, locale, IS_STRING, 0)
 	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, canonicalize, _IS_BOOL, 0, "false")
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_Locale_lookup, 0, 0, 2)
-	ZEND_ARG_TYPE_INFO(0, langtag, IS_ARRAY, 0)
+	ZEND_ARG_TYPE_INFO(0, languageTag, IS_ARRAY, 0)
 	ZEND_ARG_TYPE_INFO(0, locale, IS_STRING, 0)
 	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, canonicalize, _IS_BOOL, 0, "false")
-	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, def, IS_STRING, 1, "null")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, defaultLocale, IS_STRING, 1, "null")
 ZEND_END_ARG_INFO()
 
 #define arginfo_class_Locale_canonicalize arginfo_class_Locale_setDefault
@@ -98,3 +98,13 @@ static const zend_function_entry class_Locale_methods[] = {
 	ZEND_ME_MAPPING(acceptFromHttp, locale_accept_from_http, arginfo_class_Locale_acceptFromHttp, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	ZEND_FE_END
 };
+
+static zend_class_entry *register_class_Locale(void)
+{
+	zend_class_entry ce, *class_entry;
+
+	INIT_CLASS_ENTRY(ce, "Locale", class_Locale_methods);
+	class_entry = zend_register_internal_class_ex(&ce, NULL);
+
+	return class_entry;
+}

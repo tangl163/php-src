@@ -5,7 +5,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | http://www.php.net/license/3_01.txt                                  |
+   | https://www.php.net/license/3_01.txt                                 |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -83,7 +83,7 @@ PHPDBG_INFO(error) /* {{{ */
 {
 	if (PG(last_error_message)) {
 		phpdbg_try_access {
-			phpdbg_writeln("lasterror", "error=\"%s\" file=\"%s\" line=\"%d\"", "Last error: %s at %s line %d", PG(last_error_message), PG(last_error_file), PG(last_error_lineno));
+			phpdbg_writeln("lasterror", "error=\"%s\" file=\"%s\" line=\"%d\"", "Last error: %s at %s line %d", PG(last_error_message), ZSTR_VAL(PG(last_error_file)), PG(last_error_lineno));
 		} phpdbg_catch_access {
 			phpdbg_notice("lasterror", "error=\"\"", "No error found!");
 		} phpdbg_end_try_access();
@@ -171,7 +171,7 @@ static int phpdbg_arm_auto_global(zval *ptrzv) {
 	return 0;
 }
 
-static int phpdbg_print_symbols(zend_bool show_globals) {
+static int phpdbg_print_symbols(bool show_globals) {
 	HashTable vars;
 	zend_array *symtable;
 	zend_string *var;
@@ -304,7 +304,7 @@ PHPDBG_INFO(globals) /* {{{ */
 PHPDBG_INFO(literal) /* {{{ */
 {
 	/* literals are assumed to not be manipulated during executing of their op_array and as such async safe */
-	zend_bool in_executor = PHPDBG_G(in_execution) && EG(current_execute_data) && EG(current_execute_data)->func;
+	bool in_executor = PHPDBG_G(in_execution) && EG(current_execute_data) && EG(current_execute_data)->func;
 	if (in_executor || PHPDBG_G(ops)) {
 		zend_op_array *ops = in_executor ? &EG(current_execute_data)->func->op_array : PHPDBG_G(ops);
 		int literal = 0, count = ops->last_literal - 1;
@@ -342,7 +342,7 @@ PHPDBG_INFO(memory) /* {{{ */
 {
 	size_t used, real, peak_used, peak_real;
 	zend_mm_heap *orig_heap = NULL;
-	zend_bool is_mm;
+	bool is_mm;
 
 	if (PHPDBG_G(flags) & PHPDBG_IN_SIGNAL_HANDLER) {
 		orig_heap = zend_mm_set_heap(phpdbg_original_heap_sigsafe_mem());

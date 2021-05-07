@@ -5,7 +5,7 @@
   | This source file is subject to version 3.01 of the PHP license,      |
   | that is bundled with this package in the file LICENSE, and is        |
   | available through the world-wide-web at the following url:           |
-  | http://www.php.net/license/3_01.txt                                  |
+  | https://www.php.net/license/3_01.txt                                 |
   | If you did not receive a copy of the PHP license and are unable to   |
   | obtain it through the world-wide-web, please send a note to          |
   | license@php.net so we can mail you a copy immediately.               |
@@ -75,7 +75,8 @@ retry:
 	if (didwrite <= 0) {
 		char *estr;
 		int err = php_socket_errno();
-		if (err == EWOULDBLOCK || err == EAGAIN) {
+
+		if (PHP_IS_TRANSIENT_ERROR(err)) {
 			if (sock->is_blocked) {
 				int retval;
 
@@ -103,10 +104,13 @@ retry:
 			}
 		}
 
-		estr = php_socket_strerror(err, NULL, 0);
-		php_error_docref(NULL, E_NOTICE, "Send of " ZEND_LONG_FMT " bytes failed with errno=%d %s",
+		if (!(stream->flags & PHP_STREAM_FLAG_SUPPRESS_ERRORS)) {
+			estr = php_socket_strerror(err, NULL, 0);
+			php_error_docref(NULL, E_NOTICE,
+				"Send of " ZEND_LONG_FMT " bytes failed with errno=%d %s",
 				(zend_long)count, err, estr);
-		efree(estr);
+			efree(estr);
+		}
 	}
 
 	if (didwrite > 0) {
@@ -166,7 +170,7 @@ static ssize_t php_sockop_read(php_stream *stream, char *buf, size_t count)
 	err = php_socket_errno();
 
 	if (nr_bytes < 0) {
-		if (err == EAGAIN || err == EWOULDBLOCK) {
+		if (PHP_IS_TRANSIENT_ERROR(err)) {
 			nr_bytes = 0;
 		} else {
 			stream->eof = 1;
@@ -747,10 +751,6 @@ static inline int php_tcp_sockop_connect(php_stream *stream, php_netstream_data_
 			return -1;
 		}
 		bindto = parse_ip_address_ex(Z_STRVAL_P(tmpzval), Z_STRLEN_P(tmpzval), &bindport, xparam->want_errortext, &xparam->outputs.error_text);
-		if (bindto == NULL) {
-			efree(host);
-			return -1;
-		}
 	}
 
 #ifdef SO_BROADCAST
@@ -816,7 +816,7 @@ static inline int php_tcp_sockop_accept(php_stream *stream, php_netstream_data_t
 		php_stream_xport_param *xparam STREAMS_DC)
 {
 	int clisock;
-	zend_bool nodelay = 0;
+	bool nodelay = 0;
 	zval *tmpzval = NULL;
 
 	xparam->outputs.client = NULL;

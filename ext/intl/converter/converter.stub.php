@@ -1,6 +1,6 @@
 <?php
 
-/** @generate-function-entries */
+/** @generate-class-entries */
 
 class UConverter
 {
@@ -9,7 +9,10 @@ class UConverter
     /** @return string|false */
     public function convert(string $str, bool $reverse = false) {}
 
-    /** @return string|null */
+    /**
+     * @param int $error
+     * @return string|null
+     */
     public function fromUCallback(int $reason, array $source, int $codePoint, &$error) {}
 
     /** @return array|false|null */
@@ -42,7 +45,7 @@ class UConverter
     /** @return string|false|null */
     public function getSubstChars() {}
 
-    /** @return string|false */
+    /** @return string */
     public static function reasonText(int $reason) {}
 
     /** @return bool */
@@ -54,7 +57,10 @@ class UConverter
     /** @return bool */
     public function setSubstChars(string $chars) {}
 
-    /** @return string|null */
+    /**
+     * @param int $error
+     * @return string|null
+     */
     public function toUCallback(int $reason, string $source, string $codeUnits, &$error) {}
 
     /** @return string|false */

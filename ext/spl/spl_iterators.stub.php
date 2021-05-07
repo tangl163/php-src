@@ -1,6 +1,6 @@
 <?php
 
-/** @generate-function-entries */
+/** @generate-class-entries */
 
 class EmptyIterator implements Iterator
 {
@@ -34,7 +34,7 @@ class RecursiveCallbackFilterIterator extends CallbackFilterIterator implements 
 
     /**
      * @return bool
-     * @alias RecursiveFilterIterator::hasChildren
+     * @implementation-alias RecursiveFilterIterator::hasChildren
      */
     public function hasChildren() {}
 
@@ -53,7 +53,6 @@ interface RecursiveIterator extends Iterator
 
 class RecursiveIteratorIterator implements OuterIterator
 {
-    /** @param Traversable $iterator */
     public function __construct(Traversable $iterator, int $mode = self::LEAVES_ONLY, int $flags = 0) {}
 
     /** @return void */
@@ -75,7 +74,7 @@ class RecursiveIteratorIterator implements OuterIterator
     public function getDepth() {}
 
     /** @return RecursiveIterator|null */
-    public function getSubIterator(int $level = UNKNOWN) {}
+    public function getSubIterator(?int $level = null) {}
 
     /** @return RecursiveIterator */
     public function getInnerIterator() {}
@@ -102,7 +101,7 @@ class RecursiveIteratorIterator implements OuterIterator
     public function nextElement() {}
 
     /** @return void */
-    public function setMaxDepth(int $max_depth = -1) {}
+    public function setMaxDepth(int $maxDepth = -1) {}
 
     /** @return int|false */
     public function getMaxDepth() {}
@@ -116,8 +115,7 @@ interface OuterIterator extends Iterator
 
 class IteratorIterator implements OuterIterator
 {
-    /** @param Traversable $iterator */
-    public function __construct($iterator, string $class_name = UNKNOWN) {}
+    public function __construct(Traversable $iterator, ?string $class = null) {}
 
     /** @return Iterator|null */
     public function getInnerIterator() {}
@@ -169,7 +167,7 @@ class ParentIterator extends RecursiveFilterIterator
 
     /**
      * @return bool
-     * @alias RecursiveFilterIterator::hasChildren
+     * @implementation-alias RecursiveFilterIterator::hasChildren
      */
     public function accept() {}
 }
@@ -177,12 +175,12 @@ class ParentIterator extends RecursiveFilterIterator
 interface SeekableIterator extends Iterator
 {
     /** @return void */
-    public function seek(int $position);
+    public function seek(int $offset);
 }
 
 class LimitIterator extends IteratorIterator
 {
-    public function __construct(Iterator $iterator, int $offset = 0, int $count = -1) {}
+    public function __construct(Iterator $iterator, int $offset = 0, int $limit = -1) {}
 
     /** @return void */
     public function rewind() {}
@@ -194,13 +192,13 @@ class LimitIterator extends IteratorIterator
     public function next() {}
 
     /** @return int */
-    public function seek(int $position) {}
+    public function seek(int $offset) {}
 
     /** @return int */
     public function getPosition() {}
 }
 
-class CachingIterator extends IteratorIterator implements ArrayAccess, Countable
+class CachingIterator extends IteratorIterator implements ArrayAccess, Countable, Stringable
 {
     public function __construct(Iterator $iterator, int $flags = self::CALL_TOSTRING) {}
 
@@ -225,29 +223,28 @@ class CachingIterator extends IteratorIterator implements ArrayAccess, Countable
     public function setFlags(int $flags) {}
 
     /**
-     * @param string $index
+     * @param string $key
      * @return mixed
      */
-    public function offsetGet($index) {}
+    public function offsetGet($key) {}
 
     /**
-     * @param string $index
-     * @param mixed $value
+     * @param string $key
      * @return void
      */
-    public function offsetSet($index, $value) {}
+    public function offsetSet($key, mixed $value) {}
 
     /**
-     * @param string $index
+     * @param string $key
      * @return void
      */
-    public function offsetUnset($index) {}
+    public function offsetUnset($key) {}
 
     /**
-     * @param string $index
+     * @param string $key
      * @return bool
      */
-    public function offsetExists($index) {}
+    public function offsetExists($key) {}
 
     /** @return array */
     public function getCache() {}
@@ -323,7 +320,9 @@ class InfiniteIterator extends IteratorIterator
 
 class RegexIterator extends FilterIterator
 {
-    public function __construct(Iterator $iterator, string $regex, int $mode = self::MATCH, int $flags = 0, int $preg_flags = 0) {}
+    public ?string $replacement = null;
+
+    public function __construct(Iterator $iterator, string $pattern, int $mode = self::MATCH, int $flags = 0, int $pregFlags = 0) {}
 
     /** @return bool */
     public function accept() {}
@@ -347,19 +346,19 @@ class RegexIterator extends FilterIterator
     public function getPregFlags() {}
 
     /** @return void */
-    public function setPregFlags(int $preg_flags) {}
+    public function setPregFlags(int $pregFlags) {}
 }
 
 class RecursiveRegexIterator extends RegexIterator implements RecursiveIterator
 {
-    public function __construct(RecursiveIterator $iterator, string $regex, int $mode = self::MATCH, int $flags = 0, int $preg_flags = 0) {}
+    public function __construct(RecursiveIterator $iterator, string $pattern, int $mode = self::MATCH, int $flags = 0, int $pregFlags = 0) {}
 
     /** @return bool */
     public function accept() {}
 
     /**
      * @return bool
-     * @alias RecursiveFilterIterator::hasChildren
+     * @implementation-alias RecursiveFilterIterator::hasChildren
      */
     public function hasChildren() {}
 
@@ -371,7 +370,9 @@ class RecursiveTreeIterator extends RecursiveIteratorIterator
 {
     /** @param RecursiveIterator|IteratorAggregate $iterator */
     public function __construct(
-        $iterator, int $flags = self::BYPASS_KEY, int $caching_it_flags = CachingIterator::CATCH_GET_CHILD,
+        $iterator,
+        int $flags = self::BYPASS_KEY,
+        int $cachingIteratorFlags = CachingIterator::CATCH_GET_CHILD,
         int $mode = self::SELF_FIRST
     ) {}
 

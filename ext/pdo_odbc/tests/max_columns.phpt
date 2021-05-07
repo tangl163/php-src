@@ -3,6 +3,8 @@ PDO ODBC varying character with max/no length
 --SKIPIF--
 <?php
 if (!extension_loaded('pdo_odbc')) print 'skip not loaded';
+require 'ext/pdo/tests/pdo_test.inc';
+PDOTest::skip();
 ?>
 --FILE--
 <?php
@@ -41,5 +43,6 @@ foreach ($db->query('SELECT id, data from TEST') as $row) {
 }
 
 echo "Finished\n";
+?>
 --EXPECT--
 Finished

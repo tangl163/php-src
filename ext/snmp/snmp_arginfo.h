@@ -1,45 +1,49 @@
 /* This is a generated file, edit the .stub.php file instead.
- * Stub hash: 2b0a8233a01de36e93c025bc40c3a2f707825595 */
+ * Stub hash: 08192d87d2ac5d35092cfcf4a2cdcc50f7ec4ada */
 
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_MASK_EX(arginfo_snmpget, 0, 3, MAY_BE_ARRAY|MAY_BE_BOOL)
-	ZEND_ARG_TYPE_INFO(0, host, IS_STRING, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_TYPE_MASK_EX(arginfo_snmpget, 0, 3, stdClass, MAY_BE_ARRAY|MAY_BE_STRING|MAY_BE_BOOL)
+	ZEND_ARG_TYPE_INFO(0, hostname, IS_STRING, 0)
 	ZEND_ARG_TYPE_INFO(0, community, IS_STRING, 0)
-	ZEND_ARG_INFO(0, object_id)
-	ZEND_ARG_TYPE_INFO(0, timeout, IS_LONG, 0)
-	ZEND_ARG_TYPE_INFO(0, retries, IS_LONG, 0)
+	ZEND_ARG_TYPE_MASK(0, object_id, MAY_BE_ARRAY|MAY_BE_STRING, NULL)
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, timeout, IS_LONG, 0, "-1")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, retries, IS_LONG, 0, "-1")
 ZEND_END_ARG_INFO()
 
 #define arginfo_snmpgetnext arginfo_snmpget
 
-#define arginfo_snmpwalk arginfo_snmpget
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_MASK_EX(arginfo_snmpwalk, 0, 3, MAY_BE_ARRAY|MAY_BE_BOOL)
+	ZEND_ARG_TYPE_INFO(0, hostname, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, community, IS_STRING, 0)
+	ZEND_ARG_TYPE_MASK(0, object_id, MAY_BE_ARRAY|MAY_BE_STRING, NULL)
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, timeout, IS_LONG, 0, "-1")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, retries, IS_LONG, 0, "-1")
+ZEND_END_ARG_INFO()
 
-#define arginfo_snmprealwalk arginfo_snmpget
+#define arginfo_snmprealwalk arginfo_snmpwalk
 
-#define arginfo_snmpwalkoid arginfo_snmpget
+#define arginfo_snmpwalkoid arginfo_snmpwalk
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_MASK_EX(arginfo_snmpset, 0, 5, MAY_BE_ARRAY|MAY_BE_BOOL)
-	ZEND_ARG_TYPE_INFO(0, host, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, hostname, IS_STRING, 0)
 	ZEND_ARG_TYPE_INFO(0, community, IS_STRING, 0)
-	ZEND_ARG_INFO(0, object_id)
-	ZEND_ARG_INFO(0, type)
-	ZEND_ARG_INFO(0, value)
-	ZEND_ARG_TYPE_INFO(0, timeout, IS_LONG, 0)
-	ZEND_ARG_TYPE_INFO(0, retries, IS_LONG, 0)
+	ZEND_ARG_TYPE_MASK(0, object_id, MAY_BE_ARRAY|MAY_BE_STRING, NULL)
+	ZEND_ARG_TYPE_MASK(0, type, MAY_BE_ARRAY|MAY_BE_STRING, NULL)
+	ZEND_ARG_TYPE_MASK(0, value, MAY_BE_ARRAY|MAY_BE_STRING, NULL)
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, timeout, IS_LONG, 0, "-1")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, retries, IS_LONG, 0, "-1")
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_snmp_get_quick_print, 0, 0, _IS_BOOL, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_snmp_set_quick_print, 0, 1, _IS_BOOL, 0)
-	ZEND_ARG_TYPE_INFO(0, quick_print, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, enable, _IS_BOOL, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_snmp_set_enum_print, 0, 1, _IS_BOOL, 0)
-	ZEND_ARG_TYPE_INFO(0, enum_print, IS_LONG, 0)
-ZEND_END_ARG_INFO()
+#define arginfo_snmp_set_enum_print arginfo_snmp_set_quick_print
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_snmp_set_oid_output_format, 0, 1, _IS_BOOL, 0)
-	ZEND_ARG_TYPE_INFO(0, oid_format, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, format, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
 #define arginfo_snmp_set_oid_numeric_print arginfo_snmp_set_oid_output_format
@@ -48,44 +52,55 @@ ZEND_END_ARG_INFO()
 
 #define arginfo_snmp2_getnext arginfo_snmpget
 
-#define arginfo_snmp2_walk arginfo_snmpget
+#define arginfo_snmp2_walk arginfo_snmpwalk
 
-#define arginfo_snmp2_real_walk arginfo_snmpget
+#define arginfo_snmp2_real_walk arginfo_snmpwalk
 
 #define arginfo_snmp2_set arginfo_snmpset
 
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_MASK_EX(arginfo_snmp3_get, 0, 8, MAY_BE_ARRAY|MAY_BE_BOOL)
-	ZEND_ARG_TYPE_INFO(0, host, IS_STRING, 0)
-	ZEND_ARG_TYPE_INFO(0, sec_name, IS_STRING, 0)
-	ZEND_ARG_TYPE_INFO(0, sec_level, IS_STRING, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_TYPE_MASK_EX(arginfo_snmp3_get, 0, 8, stdClass, MAY_BE_ARRAY|MAY_BE_STRING|MAY_BE_BOOL)
+	ZEND_ARG_TYPE_INFO(0, hostname, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, security_name, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, security_level, IS_STRING, 0)
 	ZEND_ARG_TYPE_INFO(0, auth_protocol, IS_STRING, 0)
 	ZEND_ARG_TYPE_INFO(0, auth_passphrase, IS_STRING, 0)
-	ZEND_ARG_TYPE_INFO(0, priv_protocol, IS_STRING, 0)
-	ZEND_ARG_TYPE_INFO(0, priv_passphrase, IS_STRING, 0)
-	ZEND_ARG_INFO(0, object_id)
-	ZEND_ARG_TYPE_INFO(0, timeout, IS_LONG, 0)
-	ZEND_ARG_TYPE_INFO(0, retries, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, privacy_protocol, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, privacy_passphrase, IS_STRING, 0)
+	ZEND_ARG_TYPE_MASK(0, object_id, MAY_BE_ARRAY|MAY_BE_STRING, NULL)
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, timeout, IS_LONG, 0, "-1")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, retries, IS_LONG, 0, "-1")
 ZEND_END_ARG_INFO()
 
 #define arginfo_snmp3_getnext arginfo_snmp3_get
 
-#define arginfo_snmp3_walk arginfo_snmp3_get
-
-#define arginfo_snmp3_real_walk arginfo_snmp3_get
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_MASK_EX(arginfo_snmp3_set, 0, 10, MAY_BE_ARRAY|MAY_BE_BOOL)
-	ZEND_ARG_TYPE_INFO(0, host, IS_STRING, 0)
-	ZEND_ARG_TYPE_INFO(0, sec_name, IS_STRING, 0)
-	ZEND_ARG_TYPE_INFO(0, sec_level, IS_STRING, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_MASK_EX(arginfo_snmp3_walk, 0, 8, MAY_BE_ARRAY|MAY_BE_BOOL)
+	ZEND_ARG_TYPE_INFO(0, hostname, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, security_name, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, security_level, IS_STRING, 0)
 	ZEND_ARG_TYPE_INFO(0, auth_protocol, IS_STRING, 0)
 	ZEND_ARG_TYPE_INFO(0, auth_passphrase, IS_STRING, 0)
-	ZEND_ARG_TYPE_INFO(0, priv_protocol, IS_STRING, 0)
-	ZEND_ARG_TYPE_INFO(0, priv_passphrase, IS_STRING, 0)
-	ZEND_ARG_INFO(0, object_id)
-	ZEND_ARG_INFO(0, type)
-	ZEND_ARG_INFO(0, value)
-	ZEND_ARG_TYPE_INFO(0, timeout, IS_LONG, 0)
-	ZEND_ARG_TYPE_INFO(0, retries, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, privacy_protocol, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, privacy_passphrase, IS_STRING, 0)
+	ZEND_ARG_TYPE_MASK(0, object_id, MAY_BE_ARRAY|MAY_BE_STRING, NULL)
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, timeout, IS_LONG, 0, "-1")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, retries, IS_LONG, 0, "-1")
+ZEND_END_ARG_INFO()
+
+#define arginfo_snmp3_real_walk arginfo_snmp3_walk
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_MASK_EX(arginfo_snmp3_set, 0, 10, MAY_BE_ARRAY|MAY_BE_BOOL)
+	ZEND_ARG_TYPE_INFO(0, hostname, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, security_name, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, security_level, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, auth_protocol, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, auth_passphrase, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, privacy_protocol, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, privacy_passphrase, IS_STRING, 0)
+	ZEND_ARG_TYPE_MASK(0, object_id, MAY_BE_ARRAY|MAY_BE_STRING, NULL)
+	ZEND_ARG_TYPE_MASK(0, type, MAY_BE_ARRAY|MAY_BE_STRING, NULL)
+	ZEND_ARG_TYPE_MASK(0, value, MAY_BE_ARRAY|MAY_BE_STRING, NULL)
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, timeout, IS_LONG, 0, "-1")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, retries, IS_LONG, 0, "-1")
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_snmp_set_valueretrieval, 0, 1, _IS_BOOL, 0)
@@ -101,45 +116,45 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_SNMP___construct, 0, 0, 3)
 	ZEND_ARG_TYPE_INFO(0, version, IS_LONG, 0)
-	ZEND_ARG_TYPE_INFO(0, host, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, hostname, IS_STRING, 0)
 	ZEND_ARG_TYPE_INFO(0, community, IS_STRING, 0)
-	ZEND_ARG_TYPE_INFO(0, timeout, IS_LONG, 0)
-	ZEND_ARG_TYPE_INFO(0, retries, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, timeout, IS_LONG, 0, "-1")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, retries, IS_LONG, 0, "-1")
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_SNMP_close, 0, 0, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_SNMP_setSecurity, 0, 0, 1)
-	ZEND_ARG_TYPE_INFO(0, sec_level, IS_STRING, 0)
-	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, auth_protocol, IS_STRING, 0, "\'\'")
-	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, auth_passphrase, IS_STRING, 0, "\'\'")
-	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, priv_protocol, IS_STRING, 0, "\'\'")
-	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, priv_passphrase, IS_STRING, 0, "\'\'")
-	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, contextName, IS_STRING, 0, "\'\'")
-	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, contextEngineID, IS_STRING, 0, "\'\'")
+	ZEND_ARG_TYPE_INFO(0, securityLevel, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, authProtocol, IS_STRING, 0, "\"\"")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, authPassphrase, IS_STRING, 0, "\"\"")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, privacyProtocol, IS_STRING, 0, "\"\"")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, privacyPassphrase, IS_STRING, 0, "\"\"")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, contextName, IS_STRING, 0, "\"\"")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, contextEngineId, IS_STRING, 0, "\"\"")
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_SNMP_get, 0, 0, 1)
-	ZEND_ARG_INFO(0, object_id)
-	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, use_orignames, _IS_BOOL, 0, "false")
+	ZEND_ARG_TYPE_MASK(0, objectId, MAY_BE_ARRAY|MAY_BE_STRING, NULL)
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, preserveKeys, _IS_BOOL, 0, "false")
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_SNMP_getnext, 0, 0, 1)
-	ZEND_ARG_INFO(0, object_id)
+	ZEND_ARG_TYPE_MASK(0, objectId, MAY_BE_ARRAY|MAY_BE_STRING, NULL)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_SNMP_walk, 0, 0, 1)
-	ZEND_ARG_INFO(0, object_id)
-	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, suffix_keys, _IS_BOOL, 0, "false")
-	ZEND_ARG_TYPE_INFO(0, max_repetitions, IS_LONG, 0)
-	ZEND_ARG_TYPE_INFO(0, non_repeaters, IS_LONG, 0)
+	ZEND_ARG_TYPE_MASK(0, objectId, MAY_BE_ARRAY|MAY_BE_STRING, NULL)
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, suffixAsKey, _IS_BOOL, 0, "false")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, maxRepetitions, IS_LONG, 0, "-1")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, nonRepeaters, IS_LONG, 0, "-1")
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_SNMP_set, 0, 0, 3)
-	ZEND_ARG_INFO(0, object_id)
-	ZEND_ARG_INFO(0, type)
-	ZEND_ARG_INFO(0, value)
+	ZEND_ARG_TYPE_MASK(0, objectId, MAY_BE_ARRAY|MAY_BE_STRING, NULL)
+	ZEND_ARG_TYPE_MASK(0, type, MAY_BE_ARRAY|MAY_BE_STRING, NULL)
+	ZEND_ARG_TYPE_MASK(0, value, MAY_BE_ARRAY|MAY_BE_STRING, NULL)
 ZEND_END_ARG_INFO()
 
 #define arginfo_class_SNMP_getErrno arginfo_class_SNMP_close
@@ -221,3 +236,28 @@ static const zend_function_entry class_SNMP_methods[] = {
 	ZEND_ME(SNMP, getError, arginfo_class_SNMP_getError, ZEND_ACC_PUBLIC)
 	ZEND_FE_END
 };
+
+
+static const zend_function_entry class_SNMPException_methods[] = {
+	ZEND_FE_END
+};
+
+static zend_class_entry *register_class_SNMP(void)
+{
+	zend_class_entry ce, *class_entry;
+
+	INIT_CLASS_ENTRY(ce, "SNMP", class_SNMP_methods);
+	class_entry = zend_register_internal_class_ex(&ce, NULL);
+
+	return class_entry;
+}
+
+static zend_class_entry *register_class_SNMPException(zend_class_entry *class_entry_RuntimeException)
+{
+	zend_class_entry ce, *class_entry;
+
+	INIT_CLASS_ENTRY(ce, "SNMPException", class_SNMPException_methods);
+	class_entry = zend_register_internal_class_ex(&ce, class_entry_RuntimeException);
+
+	return class_entry;
+}

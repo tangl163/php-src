@@ -1,6 +1,10 @@
 <?php
 
-/** @generate-function-entries */
+/** @generate-class-entries */
+
+class stdClass
+{
+}
 
 function zend_version(): string {}
 
@@ -39,7 +43,7 @@ function is_subclass_of(mixed $object_or_class, string $class, bool $allow_strin
 /** @param object|string $object_or_class */
 function is_a(mixed $object_or_class, string $class, bool $allow_string = false): bool {}
 
-function get_class_vars(string $class): array|false {}
+function get_class_vars(string $class): array {}
 
 function get_object_vars(object $object): array {}
 
@@ -48,16 +52,18 @@ function get_mangled_object_vars(object $object): array {}
 function get_class_methods(object|string $object_or_class): array {}
 
 /** @param object|string $object_or_class */
-function method_exists(mixed $object_or_class, string $method): bool {}
+function method_exists($object_or_class, string $method): bool {}
 
 /** @param object|string $object_or_class */
-function property_exists(mixed $object_or_class, string $property): bool {}
+function property_exists($object_or_class, string $property): bool {}
 
 function class_exists(string $class, bool $autoload = true): bool {}
 
 function interface_exists(string $interface, bool $autoload = true): bool {}
 
 function trait_exists(string $trait, bool $autoload = true): bool {}
+
+function enum_exists(string $enum, bool $autoload = true): bool {}
 
 function function_exists(string $function): bool {}
 
@@ -68,18 +74,18 @@ function get_included_files(): array {}
 /** @alias get_included_files */
 function get_required_files(): array {}
 
-function trigger_error(string $message, int $error_type = E_USER_NOTICE): bool {}
+function trigger_error(string $message, int $error_level = E_USER_NOTICE): bool {}
 
 /** @alias trigger_error */
-function user_error(string $message, int $error_type = E_USER_NOTICE): bool {}
+function user_error(string $message, int $error_level = E_USER_NOTICE): bool {}
 
 /** @return string|array|object|null */
-function set_error_handler(?callable $error_handler, int $error_types = E_ALL) {}
+function set_error_handler(?callable $callback, int $error_levels = E_ALL) {}
 
 function restore_error_handler(): bool {}
 
 /** @return string|array|object|null */
-function set_exception_handler(?callable $exception_handler) {}
+function set_exception_handler(?callable $callback) {}
 
 function restore_exception_handler(): bool {}
 

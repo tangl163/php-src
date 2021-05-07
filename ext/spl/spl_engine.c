@@ -5,7 +5,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | http://www.php.net/license/3_01.txt                                  |
+   | https://www.php.net/license/3_01.txt                                 |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -41,7 +41,7 @@ try_again:
 		}
 		break;
 	case IS_DOUBLE:
-		return (zend_long)Z_DVAL_P(offset);
+		return zend_dval_to_lval(Z_DVAL_P(offset));
 	case IS_LONG:
 		return Z_LVAL_P(offset);
 	case IS_FALSE:

@@ -5,7 +5,7 @@
   | This source file is subject to version 3.01 of the PHP license,      |
   | that is bundled with this package in the file LICENSE, and is        |
   | available through the world-wide-web at the following url:           |
-  | http://www.php.net/license/3_01.txt                                  |
+  | https://www.php.net/license/3_01.txt                                 |
   | If you did not receive a copy of the PHP license and are unable to   |
   | obtain it through the world-wide-web, please send a note to          |
   | license@php.net so we can mail you a copy immediately.               |
@@ -26,7 +26,7 @@ static const char * const mysqlnd_debug_empty_string = "";
 
 /* {{{ mysqlnd_debug::open */
 static enum_func_status
-MYSQLND_METHOD(mysqlnd_debug, open)(MYSQLND_DEBUG * self, zend_bool reopen)
+MYSQLND_METHOD(mysqlnd_debug, open)(MYSQLND_DEBUG * self, bool reopen)
 {
 	if (!self->file_name) {
 		return FAIL;
@@ -239,7 +239,7 @@ MYSQLND_METHOD(mysqlnd_debug, log_va)(MYSQLND_DEBUG *self,
 
 /* FALSE - The DBG_ calls won't be traced, TRUE - will be traced */
 /* {{{ mysqlnd_debug::func_enter */
-static zend_bool
+static bool
 MYSQLND_METHOD(mysqlnd_debug, func_enter)(MYSQLND_DEBUG * self,
 										  unsigned int line, const char * const file,
 										  const char * const func_name, unsigned int func_name_len)
@@ -313,7 +313,7 @@ MYSQLND_METHOD(mysqlnd_debug, func_leave)(MYSQLND_DEBUG * self, unsigned int lin
 	char **func_name;
 	uint64_t * parent_non_own_time_ptr = NULL, * mine_non_own_time_ptr = NULL;
 	uint64_t mine_non_own_time = 0;
-	zend_bool profile_calls = self->flags & MYSQLND_DEBUG_PROFILE_CALLS? TRUE:FALSE;
+	bool profile_calls = self->flags & MYSQLND_DEBUG_PROFILE_CALLS? TRUE:FALSE;
 
 	if ((self->flags & MYSQLND_DEBUG_DUMP_TRACE) == 0 || self->file_name == NULL) {
 		return PASS;
@@ -412,7 +412,8 @@ MYSQLND_METHOD(mysqlnd_debug, func_leave)(MYSQLND_DEBUG * self, unsigned int lin
 #endif
 	}
 
-	return zend_stack_del_top(&self->call_stack) == SUCCESS? PASS:FAIL;
+	zend_stack_del_top(&self->call_stack);
+	return PASS;
 }
 /* }}} */
 
@@ -514,6 +515,7 @@ MYSQLND_METHOD(mysqlnd_debug, set_mode)(MYSQLND_DEBUG * self, const char * const
 			case 'O':
 			case 'A':
 				self->flags |= MYSQLND_DEBUG_FLUSH;
+				ZEND_FALLTHROUGH;
 			case 'a':
 			case 'o':
 				if (mode[i] == 'a' || mode[i] == 'A') {
@@ -522,7 +524,7 @@ MYSQLND_METHOD(mysqlnd_debug, set_mode)(MYSQLND_DEBUG * self, const char * const
 				if (i + 1 < mode_len && mode[i+1] == ',') {
 					unsigned int j = i + 2;
 #ifdef PHP_WIN32
-					if (i+4 < mode_len && mode[i+3] == ':' && (mode[i+4] == '\\' || mode[i+5] == '/')) {
+					if (i+4 < mode_len && mode[i+3] == ':' && (mode[i+4] == '\\' || mode[i+4] == '/')) {
 						j = i + 5;
 					}
 #endif
@@ -543,11 +545,9 @@ MYSQLND_METHOD(mysqlnd_debug, set_mode)(MYSQLND_DEBUG * self, const char * const
 				state = PARSER_WAIT_COLON;
 				break;
 			case ':':
-#if 0
 				if (state != PARSER_WAIT_COLON) {
 					php_error_docref(NULL, E_WARNING, "Consecutive semicolons at position %u", i);
 				}
-#endif
 				state = PARSER_WAIT_MODIFIER;
 				break;
 			case 'f': /* limit output to these functions */
@@ -581,10 +581,8 @@ MYSQLND_METHOD(mysqlnd_debug, set_mode)(MYSQLND_DEBUG * self, const char * const
 					}
 					i = j;
 				} else {
-#if 0
 					php_error_docref(NULL, E_WARNING,
 									 "Expected list of functions for '%c' found none", mode[i]);
-#endif
 				}
 				state = PARSER_WAIT_COLON;
 				break;
@@ -661,9 +659,7 @@ MYSQLND_METHOD(mysqlnd_debug, set_mode)(MYSQLND_DEBUG * self, const char * const
 				break;
 			default:
 				if (state == PARSER_WAIT_MODIFIER) {
-#if 0
 					php_error_docref(NULL, E_WARNING, "Unrecognized format '%c'", mode[i]);
-#endif
 					if (i+1 < mode_len && mode[i+1] == ',') {
 						i+= 2;
 						while (i < mode_len) {
@@ -675,9 +671,7 @@ MYSQLND_METHOD(mysqlnd_debug, set_mode)(MYSQLND_DEBUG * self, const char * const
 					}
 					state = PARSER_WAIT_COLON;
 				} else if (state == PARSER_WAIT_COLON) {
-#if 0
 					php_error_docref(NULL, E_WARNING, "Colon expected, '%c' found", mode[i]);
-#endif
 				}
 				break;
 		}

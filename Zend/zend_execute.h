@@ -43,14 +43,15 @@ ZEND_API void zend_init_code_execute_data(zend_execute_data *execute_data, zend_
 ZEND_API void zend_execute(zend_op_array *op_array, zval *return_value);
 ZEND_API void execute_ex(zend_execute_data *execute_data);
 ZEND_API void execute_internal(zend_execute_data *execute_data, zval *return_value);
+ZEND_API bool zend_is_valid_class_name(zend_string *name);
 ZEND_API zend_class_entry *zend_lookup_class(zend_string *name);
 ZEND_API zend_class_entry *zend_lookup_class_ex(zend_string *name, zend_string *lcname, uint32_t flags);
 ZEND_API zend_class_entry *zend_get_called_scope(zend_execute_data *ex);
 ZEND_API zend_object *zend_get_this_object(zend_execute_data *ex);
-ZEND_API int zend_eval_string(const char *str, zval *retval_ptr, const char *string_name);
-ZEND_API int zend_eval_stringl(const char *str, size_t str_len, zval *retval_ptr, const char *string_name);
-ZEND_API int zend_eval_string_ex(const char *str, zval *retval_ptr, const char *string_name, int handle_exceptions);
-ZEND_API int zend_eval_stringl_ex(const char *str, size_t str_len, zval *retval_ptr, const char *string_name, int handle_exceptions);
+ZEND_API zend_result zend_eval_string(const char *str, zval *retval_ptr, const char *string_name);
+ZEND_API zend_result zend_eval_stringl(const char *str, size_t str_len, zval *retval_ptr, const char *string_name);
+ZEND_API zend_result zend_eval_string_ex(const char *str, zval *retval_ptr, const char *string_name, bool handle_exceptions);
+ZEND_API zend_result zend_eval_stringl_ex(const char *str, size_t str_len, zval *retval_ptr, const char *string_name, bool handle_exceptions);
 
 /* export zend_pass_function to allow comparisons against it */
 extern ZEND_API const zend_internal_function zend_pass_function;
@@ -59,22 +60,23 @@ ZEND_API ZEND_COLD void ZEND_FASTCALL zend_missing_arg_error(zend_execute_data *
 ZEND_API ZEND_COLD void ZEND_FASTCALL zend_deprecated_function(const zend_function *fbc);
 ZEND_COLD void ZEND_FASTCALL zend_param_must_be_ref(const zend_function *func, uint32_t arg_num);
 
-ZEND_API zend_bool ZEND_FASTCALL zend_verify_ref_assignable_zval(zend_reference *ref, zval *zv, zend_bool strict);
-ZEND_API zend_bool ZEND_FASTCALL zend_verify_prop_assignable_by_ref(zend_property_info *prop_info, zval *orig_val, zend_bool strict);
+ZEND_API bool ZEND_FASTCALL zend_verify_ref_assignable_zval(zend_reference *ref, zval *zv, bool strict);
+ZEND_API bool ZEND_FASTCALL zend_verify_prop_assignable_by_ref(zend_property_info *prop_info, zval *orig_val, bool strict);
 
 ZEND_API ZEND_COLD void zend_throw_ref_type_error_zval(zend_property_info *prop, zval *zv);
 ZEND_API ZEND_COLD void zend_throw_ref_type_error_type(zend_property_info *prop1, zend_property_info *prop2, zval *zv);
-ZEND_API ZEND_COLD int ZEND_FASTCALL zend_undefined_offset_write(HashTable *ht, zend_long lval);
-ZEND_API ZEND_COLD int ZEND_FASTCALL zend_undefined_index_write(HashTable *ht, zend_string *offset);
+ZEND_API ZEND_COLD zend_result ZEND_FASTCALL zend_undefined_offset_write(HashTable *ht, zend_long lval);
+ZEND_API ZEND_COLD zend_result ZEND_FASTCALL zend_undefined_index_write(HashTable *ht, zend_string *offset);
 
-ZEND_API zend_bool zend_verify_scalar_type_hint(uint32_t type_mask, zval *arg, zend_bool strict, zend_bool is_internal_arg);
+ZEND_API bool zend_verify_scalar_type_hint(uint32_t type_mask, zval *arg, bool strict, bool is_internal_arg);
 ZEND_API ZEND_COLD void zend_verify_arg_error(
-		const zend_function *zf, const zend_arg_info *arg_info,
-		int arg_num, void **cache_slot, zval *value);
+		const zend_function *zf, const zend_arg_info *arg_info, uint32_t arg_num, zval *value);
 ZEND_API ZEND_COLD void zend_verify_return_error(
-		const zend_function *zf, void **cache_slot, zval *value);
-ZEND_API zend_bool zend_verify_ref_array_assignable(zend_reference *ref);
-ZEND_API zend_bool zend_value_instanceof_static(zval *zv);
+		const zend_function *zf, zval *value);
+ZEND_API ZEND_COLD void zend_verify_never_error(
+		const zend_function *zf);
+ZEND_API bool zend_verify_ref_array_assignable(zend_reference *ref);
+ZEND_API bool zend_value_instanceof_static(zval *zv);
 
 
 #define ZEND_REF_TYPE_SOURCES(ref) \
@@ -92,7 +94,7 @@ ZEND_API zend_bool zend_value_instanceof_static(zval *zv);
 ZEND_API void ZEND_FASTCALL zend_ref_add_type_source(zend_property_info_source_list *source_list, zend_property_info *prop);
 ZEND_API void ZEND_FASTCALL zend_ref_del_type_source(zend_property_info_source_list *source_list, zend_property_info *prop);
 
-ZEND_API zval* zend_assign_to_typed_ref(zval *variable_ptr, zval *value, zend_uchar value_type, zend_bool strict);
+ZEND_API zval* zend_assign_to_typed_ref(zval *variable_ptr, zval *value, zend_uchar value_type, bool strict);
 
 static zend_always_inline void zend_copy_to_variable(zval *variable_ptr, zval *value, zend_uchar value_type)
 {
@@ -121,7 +123,7 @@ static zend_always_inline void zend_copy_to_variable(zval *variable_ptr, zval *v
 	}
 }
 
-static zend_always_inline zval* zend_assign_to_variable(zval *variable_ptr, zval *value, zend_uchar value_type, zend_bool strict)
+static zend_always_inline zval* zend_assign_to_variable(zval *variable_ptr, zval *value, zend_uchar value_type, bool strict)
 {
 	do {
 		if (UNEXPECTED(Z_REFCOUNTED_P(variable_ptr))) {
@@ -155,8 +157,8 @@ static zend_always_inline zval* zend_assign_to_variable(zval *variable_ptr, zval
 	return variable_ptr;
 }
 
-ZEND_API int zval_update_constant(zval *pp);
-ZEND_API int zval_update_constant_ex(zval *pp, zend_class_entry *scope);
+ZEND_API zend_result ZEND_FASTCALL zval_update_constant(zval *pp);
+ZEND_API zend_result ZEND_FASTCALL zval_update_constant_ex(zval *pp, zend_class_entry *scope);
 
 /* dedicated Zend executor functions - do not use! */
 struct _zend_vm_stack {
@@ -174,7 +176,7 @@ struct _zend_vm_stack {
 /*
  * In general in RELEASE build ZEND_ASSERT() must be zero-cost, but for some
  * reason, GCC generated worse code, performing CSE on assertion code and the
- * following "slow path" and moving memory read operatins from slow path into
+ * following "slow path" and moving memory read operations from slow path into
  * common header. This made a degradation for the fast path.
  * The following "#if ZEND_DEBUG" eliminates it.
  */
@@ -311,13 +313,16 @@ ZEND_API const char *get_active_class_name(const char **space);
 ZEND_API const char *get_active_function_name(void);
 ZEND_API const char *get_active_function_arg_name(uint32_t arg_num);
 ZEND_API const char *get_function_arg_name(const zend_function *func, uint32_t arg_num);
+ZEND_API zend_string *get_active_function_or_method_name(void);
+ZEND_API zend_string *get_function_or_method_name(const zend_function *func);
 ZEND_API const char *zend_get_executed_filename(void);
 ZEND_API zend_string *zend_get_executed_filename_ex(void);
 ZEND_API uint32_t zend_get_executed_lineno(void);
 ZEND_API zend_class_entry *zend_get_executed_scope(void);
-ZEND_API zend_bool zend_is_executing(void);
+ZEND_API bool zend_is_executing(void);
+ZEND_API ZEND_COLD void ZEND_FASTCALL zend_cannot_pass_by_reference(uint32_t arg_num);
 
-ZEND_API void zend_set_timeout(zend_long seconds, int reset_signals);
+ZEND_API void zend_set_timeout(zend_long seconds, bool reset_signals);
 ZEND_API void zend_unset_timeout(void);
 ZEND_API ZEND_NORETURN void ZEND_FASTCALL zend_timeout(void);
 ZEND_API zend_class_entry *zend_fetch_class(zend_string *class_name, int fetch_type);
@@ -415,7 +420,7 @@ ZEND_API int ZEND_FASTCALL zend_handle_undef_args(zend_execute_data *call);
 
 #define ZEND_CLASS_HAS_TYPE_HINTS(ce) ((ce->ce_flags & ZEND_ACC_HAS_TYPE_HINTS) == ZEND_ACC_HAS_TYPE_HINTS)
 
-zend_bool zend_verify_property_type(zend_property_info *info, zval *property, zend_bool strict);
+ZEND_API bool zend_verify_property_type(zend_property_info *info, zval *property, bool strict);
 ZEND_COLD void zend_verify_property_type_error(zend_property_info *info, zval *property);
 
 #define ZEND_REF_ADD_TYPE_SOURCE(ref, source) \

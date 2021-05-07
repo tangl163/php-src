@@ -3,7 +3,7 @@ IntlTimeZone::hasSameRules(): errors
 --SKIPIF--
 <?php
 if (!extension_loaded('intl'))
-	die('skip intl extension not enabled');
+    die('skip intl extension not enabled');
 --FILE--
 <?php
 ini_set("intl.error_level", E_WARNING);
@@ -29,9 +29,10 @@ try {
     var_dump($ex->getCode(), $ex->getMessage());
     echo "\n";
 }
+?>
 --EXPECT--
 int(0)
-string(101) "IntlTimeZone::hasSameRules(): Argument #1 ($otherTimeZone) must be of type IntlTimeZone, string given"
+string(93) "IntlTimeZone::hasSameRules(): Argument #1 ($other) must be of type IntlTimeZone, string given"
 
 int(0)
-string(83) "intltz_has_same_rules(): Argument #1 ($tz) must be of type IntlTimeZone, null given"
+string(89) "intltz_has_same_rules(): Argument #1 ($timezone) must be of type IntlTimeZone, null given"

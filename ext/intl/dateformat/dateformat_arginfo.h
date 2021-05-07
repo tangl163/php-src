@@ -1,16 +1,23 @@
 /* This is a generated file, edit the .stub.php file instead.
- * Stub hash: 86faf2e51b67db2801ce691d4d24bfdae5feb6fc */
+ * Stub hash: 5fd68ae153d18374d33a5c3848a88abc1ab67d38 */
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_class_IntlDateFormatter___construct, 0, 0, 3)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_class_IntlDateFormatter___construct, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, locale, IS_STRING, 1)
-	ZEND_ARG_TYPE_INFO(0, datetype, IS_LONG, 0)
-	ZEND_ARG_TYPE_INFO(0, timetype, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, dateType, IS_LONG, 0, "IntlDateFormatter::FULL")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, timeType, IS_LONG, 0, "IntlDateFormatter::FULL")
 	ZEND_ARG_INFO_WITH_DEFAULT_VALUE(0, timezone, "null")
 	ZEND_ARG_INFO_WITH_DEFAULT_VALUE(0, calendar, "null")
-	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, pattern, IS_STRING, 0, "\"\"")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, pattern, IS_STRING, 1, "null")
 ZEND_END_ARG_INFO()
 
-#define arginfo_class_IntlDateFormatter_create arginfo_class_IntlDateFormatter___construct
+ZEND_BEGIN_ARG_INFO_EX(arginfo_class_IntlDateFormatter_create, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, locale, IS_STRING, 1)
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, dateType, IS_LONG, 0, "IntlDateFormatter::FULL")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, timeType, IS_LONG, 0, "IntlDateFormatter::FULL")
+	ZEND_ARG_INFO_WITH_DEFAULT_VALUE(0, timezone, "null")
+	ZEND_ARG_OBJ_TYPE_MASK(0, calendar, IntlCalendar, MAY_BE_LONG|MAY_BE_NULL, "null")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, pattern, IS_STRING, 1, "null")
+ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_IntlDateFormatter_getDateType, 0, 0, 0)
 ZEND_END_ARG_INFO()
@@ -20,7 +27,7 @@ ZEND_END_ARG_INFO()
 #define arginfo_class_IntlDateFormatter_getCalendar arginfo_class_IntlDateFormatter_getDateType
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_IntlDateFormatter_setCalendar, 0, 0, 1)
-	ZEND_ARG_INFO(0, which)
+	ZEND_ARG_OBJ_TYPE_MASK(0, calendar, IntlCalendar, MAY_BE_LONG|MAY_BE_NULL, NULL)
 ZEND_END_ARG_INFO()
 
 #define arginfo_class_IntlDateFormatter_getTimeZoneId arginfo_class_IntlDateFormatter_getDateType
@@ -30,7 +37,7 @@ ZEND_END_ARG_INFO()
 #define arginfo_class_IntlDateFormatter_getTimeZone arginfo_class_IntlDateFormatter_getDateType
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_IntlDateFormatter_setTimeZone, 0, 0, 1)
-	ZEND_ARG_INFO(0, zone)
+	ZEND_ARG_INFO(0, timezone)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_IntlDateFormatter_setPattern, 0, 0, 1)
@@ -40,7 +47,7 @@ ZEND_END_ARG_INFO()
 #define arginfo_class_IntlDateFormatter_getPattern arginfo_class_IntlDateFormatter_getDateType
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_IntlDateFormatter_getLocale, 0, 0, 0)
-	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, which, IS_LONG, 0, "ULOC_ACTUAL_LOCALE")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, type, IS_LONG, 0, "ULOC_ACTUAL_LOCALE")
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_IntlDateFormatter_setLenient, 0, 0, 1)
@@ -50,18 +57,18 @@ ZEND_END_ARG_INFO()
 #define arginfo_class_IntlDateFormatter_isLenient arginfo_class_IntlDateFormatter_getDateType
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_IntlDateFormatter_format, 0, 0, 1)
-	ZEND_ARG_INFO(0, value)
+	ZEND_ARG_INFO(0, datetime)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_IntlDateFormatter_formatObject, 0, 0, 1)
-	ZEND_ARG_INFO(0, object)
+	ZEND_ARG_INFO(0, datetime)
 	ZEND_ARG_INFO_WITH_DEFAULT_VALUE(0, format, "null")
 	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, locale, IS_STRING, 1, "null")
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_IntlDateFormatter_parse, 0, 0, 1)
-	ZEND_ARG_TYPE_INFO(0, value, IS_STRING, 0)
-	ZEND_ARG_INFO_WITH_DEFAULT_VALUE(1, position, "null")
+	ZEND_ARG_TYPE_INFO(0, string, IS_STRING, 0)
+	ZEND_ARG_INFO_WITH_DEFAULT_VALUE(1, offset, "null")
 ZEND_END_ARG_INFO()
 
 #define arginfo_class_IntlDateFormatter_localtime arginfo_class_IntlDateFormatter_parse
@@ -118,3 +125,13 @@ static const zend_function_entry class_IntlDateFormatter_methods[] = {
 	ZEND_ME_MAPPING(getErrorMessage, datefmt_get_error_message, arginfo_class_IntlDateFormatter_getErrorMessage, ZEND_ACC_PUBLIC)
 	ZEND_FE_END
 };
+
+static zend_class_entry *register_class_IntlDateFormatter(void)
+{
+	zend_class_entry ce, *class_entry;
+
+	INIT_CLASS_ENTRY(ce, "IntlDateFormatter", class_IntlDateFormatter_methods);
+	class_entry = zend_register_internal_class_ex(&ce, NULL);
+
+	return class_entry;
+}

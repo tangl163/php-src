@@ -5,7 +5,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | http://www.php.net/license/3_01.txt                                  |
+   | https://www.php.net/license/3_01.txt                                 |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -41,8 +41,9 @@ static int le_bucket;
 
 PHP_METHOD(php_user_filter, filter)
 {
-	zval *in, *out, *consumed, *closing;
-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "zzzz", &in, &out, &consumed, &closing) == FAILURE) {
+	zval *in, *out, *consumed;
+	bool closing;
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "rrzb", &in, &out, &consumed, &closing) == FAILURE) {
 		RETURN_THROWS();
 	}
 }
@@ -57,7 +58,7 @@ PHP_METHOD(php_user_filter, onClose)
 	ZEND_PARSE_PARAMETERS_NONE();
 }
 
-static zend_class_entry user_filter_class_entry;
+static zend_class_entry *user_filter_class_entry;
 
 static ZEND_RSRC_DTOR_FUNC(php_bucket_dtor)
 {
@@ -70,14 +71,8 @@ static ZEND_RSRC_DTOR_FUNC(php_bucket_dtor)
 
 PHP_MINIT_FUNCTION(user_filters)
 {
-	zend_class_entry *php_user_filter;
 	/* init the filter class ancestor */
-	INIT_CLASS_ENTRY(user_filter_class_entry, "php_user_filter", class_php_user_filter_methods);
-	if ((php_user_filter = zend_register_internal_class(&user_filter_class_entry)) == NULL) {
-		return FAILURE;
-	}
-	zend_declare_property_string(php_user_filter, "filtername", sizeof("filtername")-1, "", ZEND_ACC_PUBLIC);
-	zend_declare_property_string(php_user_filter, "params", sizeof("params")-1, "", ZEND_ACC_PUBLIC);
+	user_filter_class_entry = register_class_php_user_filter();
 
 	/* init the filter resource; it has no dtor, as streams will always clean it up
 	 * at the correct time */
@@ -298,11 +293,7 @@ static php_stream_filter *user_filter_factory_create(const char *filtername,
 			}
 			efree(wildcard);
 		}
-		if (fdat == NULL) {
-			php_error_docref(NULL, E_WARNING,
-					"Err, filter \"%s\" is not in the user-filter map, but somehow the user-filter-factory was invoked for it!?", filtername);
-			return NULL;
-		}
+		ZEND_ASSERT(fdat);
 	}
 
 	/* bind the classname to the actual class */
@@ -345,6 +336,8 @@ static php_stream_filter *user_filter_factory_create(const char *filtername,
 			&retval,
 			0, NULL);
 
+	zval_ptr_dtor(&func_name);
+
 	if (Z_TYPE(retval) != IS_UNDEF) {
 		if (Z_TYPE(retval) == IS_FALSE) {
 			/* User reported filter creation error "return false;" */
@@ -362,7 +355,6 @@ static php_stream_filter *user_filter_factory_create(const char *filtername,
 		}
 		zval_ptr_dtor(&retval);
 	}
-	zval_ptr_dtor(&func_name);
 
 	/* set the filter property, this will be used during cleanup */
 	ZVAL_RES(&zfilter, zend_register_resource(filter, le_userfilters));
@@ -428,7 +420,7 @@ static void php_stream_bucket_attach(int append, INTERNAL_FUNCTION_PARAMETERS)
 		Z_PARAM_OBJECT(zobject)
 	ZEND_PARSE_PARAMETERS_END();
 
-	if (NULL == (pzbucket = zend_hash_str_find(Z_OBJPROP_P(zobject), "bucket", sizeof("bucket")-1))) {
+	if (NULL == (pzbucket = zend_hash_str_find_deref(Z_OBJPROP_P(zobject), "bucket", sizeof("bucket")-1))) {
 		zend_argument_value_error(2, "must be an object that has a \"bucket\" property");
 		RETURN_THROWS();
 	}
@@ -442,7 +434,7 @@ static void php_stream_bucket_attach(int append, INTERNAL_FUNCTION_PARAMETERS)
 		RETURN_THROWS();
 	}
 
-	if (NULL != (pzdata = zend_hash_str_find(Z_OBJPROP_P(zobject), "data", sizeof("data")-1)) && Z_TYPE_P(pzdata) == IS_STRING) {
+	if (NULL != (pzdata = zend_hash_str_find_deref(Z_OBJPROP_P(zobject), "data", sizeof("data")-1)) && Z_TYPE_P(pzdata) == IS_STRING) {
 		if (!bucket->own_buf) {
 			bucket = php_stream_bucket_make_writeable(bucket);
 		}
@@ -502,10 +494,6 @@ PHP_FUNCTION(stream_bucket_new)
 	memcpy(pbuffer, buffer, buffer_len);
 
 	bucket = php_stream_bucket_new(stream, pbuffer, buffer_len, 1, php_stream_is_persistent(stream));
-
-	if (bucket == NULL) {
-		RETURN_FALSE;
-	}
 
 	ZVAL_RES(&zbucket, zend_register_resource(bucket, le_bucket));
 	object_init(return_value);

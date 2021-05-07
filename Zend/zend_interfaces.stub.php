@@ -1,6 +1,6 @@
 <?php
 
-/** @generate-function-entries */
+/** @generate-class-entries */
 
 interface Traversable {}
 
@@ -48,11 +48,11 @@ interface ArrayAccess
 
 interface Serializable
 {
-    /** @return string */
+    /** @return string|null */
     public function serialize();
 
     /** @return void */
-    public function unserialize(string $serialized);
+    public function unserialize(string $data);
 }
 
 interface Countable

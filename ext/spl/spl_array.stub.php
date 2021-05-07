@@ -1,42 +1,37 @@
 <?php
 
-/** @generate-function-entries */
+/** @generate-class-entries */
 
 class ArrayObject implements IteratorAggregate, ArrayAccess, Serializable, Countable
 {
-    /** @param array|object $input */
-    public function __construct($input = [], int $flags = 0, string $iterator_class = ArrayIterator::class) {}
+    public function __construct(array|object $array = [], int $flags = 0, string $iteratorClass = ArrayIterator::class) {}
 
     /**
-     * @param mixed $index
+     * @param string|int $key
      * @return bool
      */
-    public function offsetExists($index) {}
+    public function offsetExists($key) {}
 
     /**
-     * @param mixed $index
+     * @param string|int $key
      * @return mixed
      */
-    public function offsetGet($index) {}
+    public function offsetGet($key) {}
 
     /**
-     * @param mixed $index
-     * @param mixed $value
+     * @param string|int $key
      * @return void
      */
-    public function offsetSet($index, $value) {}
+    public function offsetSet($key, mixed $value) {}
 
     /**
-     * @param mixed $index
+     * @param string|int $key
      * @return void
      */
-    public function offsetUnset($index) {}
+    public function offsetUnset($key) {}
 
-    /**
-     * @param mixed $value
-     * @return void
-     */
-    public function append($value) {}
+    /** @return void */
+    public function append(mixed $value) {}
 
     /** @return array */
     public function getArrayCopy() {}
@@ -50,29 +45,17 @@ class ArrayObject implements IteratorAggregate, ArrayAccess, Serializable, Count
     /** @return void */
     public function setFlags(int $flags) {}
 
-    /**
-     * @param int $sort_flags
-     * @return bool
-     */
-    public function asort($sort_flags = SORT_REGULAR) {}
+    /** @return bool */
+    public function asort(int $flags = SORT_REGULAR) {}
 
-    /**
-     * @param int $sort_flags
-     * @return bool
-     */
-    public function ksort($sort_flags = SORT_REGULAR) {}
+    /** @return bool */
+    public function ksort(int $flags = SORT_REGULAR) {}
 
-    /**
-     * @param callback $cmp_function
-     * @return bool
-     */
-    public function uasort($cmp_function) {}
+    /** @return bool */
+    public function uasort(callable $callback) {}
 
-    /**
-     * @param callback $cmp_function
-     * @return bool
-     */
-    public function uksort($cmp_function) {}
+    /** @return bool */
+    public function uksort(callable $callback) {}
 
     /** @return bool */
     public function natsort() {}
@@ -81,7 +64,7 @@ class ArrayObject implements IteratorAggregate, ArrayAccess, Serializable, Count
     public function natcasesort() {}
 
     /** @return void */
-    public function unserialize(string $serialized) {}
+    public function unserialize(string $data) {}
 
     /** @return string */
     public function serialize() {}
@@ -95,11 +78,8 @@ class ArrayObject implements IteratorAggregate, ArrayAccess, Serializable, Count
     /** @return Iterator */
     public function getIterator() {}
 
-    /**
-     * @param array|object $input
-     * @return array|null
-     */
-    public function exchangeArray($input) {}
+    /** @return array|null */
+    public function exchangeArray(array|object $array) {}
 
     /** @return void */
     public function setIteratorClass(string $iteratorClass) {}
@@ -113,130 +93,123 @@ class ArrayObject implements IteratorAggregate, ArrayAccess, Serializable, Count
 
 class ArrayIterator implements SeekableIterator, ArrayAccess, Serializable, Countable
 {
-    /** @param array|object $array */
-    public function __construct($array = [], int $flags = 0) {}
+    public function __construct(array|object $array = [], int $flags = 0) {}
 
     /**
-     * @param mixed $index
+     * @param string|int $key
      * @return bool
-     * @alias ArrayObject::offsetExists
+     * @implementation-alias ArrayObject::offsetExists
      */
-    public function offsetExists($index) {}
+    public function offsetExists($key) {}
 
     /**
-     * @param mixed $index
+     * @param string|int $key
      * @return mixed
-     * @alias ArrayObject::offsetGet
+     * @implementation-alias ArrayObject::offsetGet
      */
-    public function offsetGet($index) {}
+    public function offsetGet($key) {}
 
     /**
-     * @param mixed $index
-     * @param mixed $value
+     * @param string|int $key
      * @return void
-     * @alias ArrayObject::offsetSet
+     * @implementation-alias ArrayObject::offsetSet
      */
-    public function offsetSet($index, $value) {}
+    public function offsetSet($key, mixed $value) {}
 
     /**
-     * @param mixed $index
+     * @param string|int $key
      * @return void
-     * @alias ArrayObject::offsetUnset
+     * @implementation-alias ArrayObject::offsetUnset
      */
-    public function offsetUnset($index) {}
+    public function offsetUnset($key) {}
 
     /**
-     * @param mixed $value
      * @return void
-     * @alias ArrayObject::append
+     * @implementation-alias ArrayObject::append
      */
-    public function append($value) {}
+    public function append(mixed $value) {}
 
     /**
      * @return array
-     * @alias ArrayObject::getArrayCopy
+     * @implementation-alias ArrayObject::getArrayCopy
      */
     public function getArrayCopy() {}
 
     /**
      * @return int
-     * @alias ArrayObject::count
+     * @implementation-alias ArrayObject::count
      */
     public function count() {}
 
     /**
      * @return int
-     * @alias ArrayObject::getFlags
+     * @implementation-alias ArrayObject::getFlags
      */
     public function getFlags() {}
 
     /**
      * @return void
-     * @alias ArrayObject::setFlags
+     * @implementation-alias ArrayObject::setFlags
      */
     public function setFlags(int $flags) {}
 
     /**
-     * @param int $sort_flags
      * @return bool
-     * @alias ArrayObject::asort
+     * @implementation-alias ArrayObject::asort
      */
-    public function asort($sort_flags = SORT_REGULAR) {}
-
-    /**
-     * @param int $sort_flags
-     * @return bool
-     * @alias ArrayObject::ksort
-     */
-    public function ksort($sort_flags = SORT_REGULAR) {}
-
-    /**
-     * @param callback $cmp_function
-     * @return bool
-     * @alias ArrayObject::uasort
-     */
-    public function uasort($cmp_function) {}
-
-    /**
-     * @param callback $cmp_function
-     * @return bool
-     * @alias ArrayObject::uksort
-     */
-    public function uksort($cmp_function) {}
+    public function asort(int $flags = SORT_REGULAR) {}
 
     /**
      * @return bool
-     * @alias ArrayObject::natsort
+     * @implementation-alias ArrayObject::ksort
+     */
+    public function ksort(int $flags = SORT_REGULAR) {}
+
+    /**
+     * @return bool
+     * @implementation-alias ArrayObject::uasort
+     */
+    public function uasort(callable $callback) {}
+
+    /**
+     * @return bool
+     * @implementation-alias ArrayObject::uksort
+     */
+    public function uksort(callable $callback) {}
+
+    /**
+     * @return bool
+     * @implementation-alias ArrayObject::natsort
      */
     public function natsort() {}
 
     /**
      * @return bool
-     * @alias ArrayObject::natcasesort
+     * @implementation-alias ArrayObject::natcasesort
      */
     public function natcasesort() {}
 
     /**
      * @return void
-     * @alias ArrayObject::unserialize
+     * @implementation-alias ArrayObject::unserialize
      */
-    public function unserialize(string $serialized) {}
+    public function unserialize(string $data) {}
 
     /**
      * @return string
-     * @alias ArrayObject::serialize
+     * @implementation-alias ArrayObject::serialize
      */
     public function serialize() {}
 
     /**
      * @return array
-     * @alias ArrayObject::__serialize
+     * @implementation-alias ArrayObject::__serialize
      */
     public function __serialize() {}
 
     /**
      * @return void
-     * @alias ArrayObject::__unserialize
+     * @implementation-alias ArrayObject::__unserialize
      */
     public function __unserialize(array $data) {}
 
@@ -256,11 +229,11 @@ class ArrayIterator implements SeekableIterator, ArrayAccess, Serializable, Coun
     public function valid() {}
 
     /** @return void */
-    public function seek(int $position) {}
+    public function seek(int $offset) {}
 
     /**
      * @return array
-     * @alias ArrayObject::__debugInfo
+     * @implementation-alias ArrayObject::__debugInfo
      */
     public function __debugInfo() {}
 }

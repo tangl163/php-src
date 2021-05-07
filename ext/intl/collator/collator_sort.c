@@ -3,7 +3,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | http://www.php.net/license/3_01.txt                                  |
+   | https://www.php.net/license/3_01.txt                                 |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -312,7 +312,7 @@ static void collator_sort_internal( int renumber, INTERNAL_FUNCTION_PARAMETERS )
 /* {{{ Sort array using specified collator. */
 PHP_FUNCTION( collator_sort )
 {
-	collator_sort_internal( TRUE, INTERNAL_FUNCTION_PARAM_PASSTHRU );
+	collator_sort_internal( true, INTERNAL_FUNCTION_PARAM_PASSTHRU );
 }
 /* }}} */
 
@@ -495,7 +495,7 @@ PHP_FUNCTION( collator_sort_with_sort_keys )
 /* {{{ Sort array using specified collator, maintaining index association. */
 PHP_FUNCTION( collator_asort )
 {
-	collator_sort_internal( FALSE, INTERNAL_FUNCTION_PARAM_PASSTHRU );
+	collator_sort_internal( false, INTERNAL_FUNCTION_PARAM_PASSTHRU );
 }
 /* }}} */
 

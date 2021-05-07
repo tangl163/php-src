@@ -1,9 +1,11 @@
 <?php
 
-/** @generate-function-entries */
+/** @generate-class-entries */
 
 class Transliterator
 {
+    public string $id;
+
     final private function __construct() {}
 
     /**
@@ -34,7 +36,7 @@ class Transliterator
      * @return string|false
      * @alias transliterator_transliterate
      */
-    public function transliterate(string $subject, int $start = 0, int $end = -1) {}
+    public function transliterate(string $string, int $start = 0, int $end = -1) {}
 
     /**
      * @return int|false

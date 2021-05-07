@@ -1,6 +1,6 @@
 <?php
 
-/** @generate-function-entries */
+/** @generate-class-entries */
 
 class ReflectionException extends Exception
 {
@@ -18,8 +18,10 @@ interface Reflector extends Stringable
 
 abstract class ReflectionFunctionAbstract implements Reflector
 {
-    /** @alias ReflectionClass::__clone */
-    final private function __clone() {}
+    public string $name;
+
+    /** @implementation-alias ReflectionClass::__clone */
+    private function __clone(): void {}
 
     /** @return bool */
     public function inNamespace() {}
@@ -147,8 +149,9 @@ final class ReflectionGenerator
 
 class ReflectionMethod extends ReflectionFunctionAbstract
 {
-    /** @param object|string $objectOrMethod */
-    public function __construct($objectOrMethod, string $method = UNKNOWN) {}
+    public string $class;
+
+    public function __construct(object|string $objectOrMethod, ?string $method = null) {}
 
     public function __toString(): string {}
 
@@ -195,15 +198,16 @@ class ReflectionMethod extends ReflectionFunctionAbstract
     public function getPrototype() {}
 
     /** @return void */
-    public function setAccessible(bool $isAccessible) {}
+    public function setAccessible(bool $accessible) {}
 }
 
 class ReflectionClass implements Reflector
 {
-    final private function __clone() {}
+    public string $name;
 
-    /** @param object|string $objectOrClass */
-    public function __construct($objectOrClass) {}
+    private function __clone(): void {}
+
+    public function __construct(object|string $objectOrClass) {}
 
     public function __toString(): string {}
 
@@ -261,11 +265,11 @@ class ReflectionClass implements Reflector
     /** @return bool */
     public function hasConstant(string $name) {}
 
-    /** @return array|null */
-    public function getConstants(int $filter = ReflectionClassConstant::IS_PUBLIC | ReflectionClassConstant::IS_PROTECTED | ReflectionClassConstant::IS_PRIVATE) {}
+    /** @return array */
+    public function getConstants(?int $filter = null) {}
 
     /** @return ReflectionClassConstant[] */
-    public function getReflectionConstants(int $filter = ReflectionClassConstant::IS_PUBLIC | ReflectionClassConstant::IS_PROTECTED | ReflectionClassConstant::IS_PRIVATE) {}
+    public function getReflectionConstants(?int $filter = null) {}
 
     /** @return mixed */
     public function getConstant(string $name) {}
@@ -293,6 +297,8 @@ class ReflectionClass implements Reflector
 
     /** @return bool */
     public function isTrait() {}
+
+    public function isEnum(): bool {}
 
     /** @return bool */
     public function isAbstract() {}
@@ -366,13 +372,16 @@ class ReflectionClass implements Reflector
 
 class ReflectionObject extends ReflectionClass
 {
-    public function __construct(object $argument) {}
+    public function __construct(object $object) {}
 }
 
 class ReflectionProperty implements Reflector
 {
-    /** @alias ReflectionClass::__clone */
-    final private function __clone() {}
+    public string $name;
+    public string $class;
+
+    /** @implementation-alias ReflectionClass::__clone */
+    private function __clone(): void {}
 
     public function __construct(object|string $class, string $property) {}
 
@@ -417,7 +426,7 @@ class ReflectionProperty implements Reflector
     public function getDocComment() {}
 
     /** @return void */
-    public function setAccessible(bool $isAccessible) {}
+    public function setAccessible(bool $accessible) {}
 
     /** @return ReflectionType|null */
     public function getType() {}
@@ -436,14 +445,17 @@ class ReflectionProperty implements Reflector
 
 class ReflectionClassConstant implements Reflector
 {
-    /** @alias ReflectionClass::__clone */
-    final private function __clone() {}
+    public string $name;
+    public string $class;
+
+    /** @implementation-alias ReflectionClass::__clone */
+    private function __clone(): void {}
 
     public function __construct(object|string $class, string $constant) {}
 
     public function __toString(): string {}
 
-    /** @return string|false */
+    /** @return string */
     public function getName() {}
 
     /** @return mixed */
@@ -469,15 +481,19 @@ class ReflectionClassConstant implements Reflector
 
     /** @return ReflectionAttribute[] */
     public function getAttributes(?string $name = null, int $flags = 0): array {}
+
+    public function isEnumCase(): bool {}
 }
 
 class ReflectionParameter implements Reflector
 {
-    /** @alias ReflectionClass::__clone */
-    final private function __clone() {}
+    public string $name;
+
+    /** @implementation-alias ReflectionClass::__clone */
+    private function __clone(): void {}
 
     /** @param string|array|object $function */
-    public function __construct($function, int|string $parameter) {}
+    public function __construct($function, int|string $param) {}
 
     public function __toString(): string {}
 
@@ -552,8 +568,8 @@ class ReflectionParameter implements Reflector
 
 abstract class ReflectionType implements Stringable
 {
-    /** @alias ReflectionClass::__clone */
-    final private function __clone() {}
+    /** @implementation-alias ReflectionClass::__clone */
+    private function __clone(): void {}
 
     /** @return bool */
     public function allowsNull() {}
@@ -577,8 +593,10 @@ class ReflectionUnionType extends ReflectionType
 
 class ReflectionExtension implements Reflector
 {
-    /** @alias ReflectionClass::__clone */
-    final private function __clone() {}
+    public string $name;
+
+    /** @implementation-alias ReflectionClass::__clone */
+    private function __clone(): void {}
 
     public function __construct(string $name) {}
 
@@ -620,8 +638,10 @@ class ReflectionExtension implements Reflector
 
 class ReflectionZendExtension implements Reflector
 {
-    /** @alias ReflectionClass::__clone */
-    final private function __clone() {}
+    public string $name;
+
+    /** @implementation-alias ReflectionClass::__clone */
+    private function __clone(): void {}
 
     public function __construct(string $name) {}
 
@@ -645,13 +665,12 @@ class ReflectionZendExtension implements Reflector
 
 final class ReflectionReference
 {
-    /** @param int|string $key */
-    public static function fromArrayElement(array $array, $key): ?ReflectionReference {}
+    public static function fromArrayElement(array $array, int|string $key): ?ReflectionReference {}
 
     public function getId(): string {}
 
-    /** @alias ReflectionClass::__clone */
-    private function __clone() {}
+    /** @implementation-alias ReflectionClass::__clone */
+    private function __clone(): void {}
 
     private function __construct() {}
 }
@@ -664,7 +683,55 @@ final class ReflectionAttribute
     public function getArguments(): array {}
     public function newInstance(): object {}
 
-    private function __clone() {}
+    private function __clone(): void {}
 
     private function __construct() {}
+}
+
+final class ReflectionEnum extends ReflectionClass
+{
+    public function __construct(object|string $objectOrClass) {}
+
+    public function hasCase(string $name): bool {}
+
+    public function getCase(string $name): ReflectionEnumUnitCase {}
+
+    /** @return ReflectionEnumUnitCase[] */
+    public function getCases(): array {}
+
+    public function isBacked(): bool {}
+
+    public function getBackingType(): ReflectionType|null {}
+}
+
+class ReflectionEnumUnitCase extends ReflectionClassConstant
+{
+    public function __construct(object|string $class, string $constant) {}
+
+    public function getEnum(): ReflectionEnum {}
+
+    /** @implementation-alias ReflectionClassConstant::getValue */
+    public function getValue(): UnitEnum {}
+}
+
+final class ReflectionEnumBackedCase extends ReflectionEnumUnitCase
+{
+    public function __construct(object|string $class, string $constant) {}
+
+    public function getBackingValue(): int|string {}
+}
+
+final class ReflectionFiber
+{
+    public function __construct(Fiber $fiber) {}
+
+    public function getFiber(): Fiber {}
+
+    public function getExecutingFile(): string {}
+
+    public function getExecutingLine(): int {}
+
+    public function getCallable(): callable {}
+
+    public function getTrace(int $options = DEBUG_BACKTRACE_PROVIDE_OBJECT): array {}
 }

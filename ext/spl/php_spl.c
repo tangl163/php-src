@@ -5,7 +5,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | http://www.php.net/license/3_01.txt                                  |
+   | https://www.php.net/license/3_01.txt                                 |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -55,7 +55,7 @@ static PHP_GINIT_FUNCTION(spl)
 }
 /* }}} */
 
-static zend_class_entry * spl_find_ce_by_name(zend_string *name, zend_bool autoload)
+static zend_class_entry * spl_find_ce_by_name(zend_string *name, bool autoload)
 {
 	zend_class_entry *ce;
 
@@ -80,7 +80,7 @@ PHP_FUNCTION(class_parents)
 {
 	zval *obj;
 	zend_class_entry *parent_class, *ce;
-	zend_bool autoload = 1;
+	bool autoload = 1;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "z|b", &obj, &autoload) == FAILURE) {
 		RETURN_THROWS();
@@ -112,7 +112,7 @@ PHP_FUNCTION(class_parents)
 PHP_FUNCTION(class_implements)
 {
 	zval *obj;
-	zend_bool autoload = 1;
+	bool autoload = 1;
 	zend_class_entry *ce;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "z|b", &obj, &autoload) == FAILURE) {
@@ -140,7 +140,7 @@ PHP_FUNCTION(class_implements)
 PHP_FUNCTION(class_uses)
 {
 	zval *obj;
-	zend_bool autoload = 1;
+	bool autoload = 1;
 	zend_class_entry *ce;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "z|b", &obj, &autoload) == FAILURE) {
@@ -239,20 +239,19 @@ PHP_FUNCTION(spl_classes)
 
 static int spl_autoload(zend_string *class_name, zend_string *lc_name, const char *ext, int ext_len) /* {{{ */
 {
-	char *class_file;
-	int class_file_len;
+	zend_string *class_file;
 	zval dummy;
 	zend_file_handle file_handle;
 	zend_op_array *new_op_array;
 	zval result;
 	int ret;
 
-	class_file_len = (int)spprintf(&class_file, 0, "%s%.*s", ZSTR_VAL(lc_name), ext_len, ext);
+	class_file = zend_strpprintf(0, "%s%.*s", ZSTR_VAL(lc_name), ext_len, ext);
 
 #if DEFAULT_SLASH != '\\'
 	{
-		char *ptr = class_file;
-		char *end = ptr + class_file_len;
+		char *ptr = ZSTR_VAL(class_file);
+		char *end = ptr + ZSTR_LEN(class_file);
 
 		while ((ptr = memchr(ptr, '\\', (end - ptr))) != NULL) {
 			*ptr = DEFAULT_SLASH;
@@ -260,21 +259,20 @@ static int spl_autoload(zend_string *class_name, zend_string *lc_name, const cha
 	}
 #endif
 
-	ret = php_stream_open_for_zend_ex(class_file, &file_handle, USE_PATH|STREAM_OPEN_FOR_INCLUDE);
+	zend_stream_init_filename_ex(&file_handle, class_file);
+	ret = php_stream_open_for_zend_ex(&file_handle, USE_PATH|STREAM_OPEN_FOR_INCLUDE);
 
 	if (ret == SUCCESS) {
 		zend_string *opened_path;
 		if (!file_handle.opened_path) {
-			file_handle.opened_path = zend_string_init(class_file, class_file_len, 0);
+			file_handle.opened_path = zend_string_copy(class_file);
 		}
 		opened_path = zend_string_copy(file_handle.opened_path);
 		ZVAL_NULL(&dummy);
 		if (zend_hash_add(&EG(included_files), opened_path, &dummy)) {
 			new_op_array = zend_compile_file(&file_handle, ZEND_REQUIRE);
-			zend_destroy_file_handle(&file_handle);
 		} else {
 			new_op_array = NULL;
-			zend_file_handle_dtor(&file_handle);
 		}
 		zend_string_release_ex(opened_path, 0);
 		if (new_op_array) {
@@ -287,11 +285,13 @@ static int spl_autoload(zend_string *class_name, zend_string *lc_name, const cha
 				zval_ptr_dtor(&result);
 			}
 
-			efree(class_file);
+			zend_destroy_file_handle(&file_handle);
+			zend_string_release(class_file);
 			return zend_hash_exists(EG(class_table), lc_name);
 		}
 	}
-	efree(class_file);
+	zend_destroy_file_handle(&file_handle);
+	zend_string_release(class_file);
 	return 0;
 } /* }}} */
 
@@ -404,7 +404,7 @@ static autoload_func_info *autoload_func_info_from_fci(
 	return alfi;
 }
 
-static zend_bool autoload_func_info_equals(
+static bool autoload_func_info_equals(
 		const autoload_func_info *alfi1, const autoload_func_info *alfi2) {
 	return alfi1->func_ptr == alfi2->func_ptr
 		&& alfi1->obj == alfi2->obj
@@ -442,9 +442,13 @@ static zend_class_entry *spl_perform_autoload(zend_string *class_name, zend_stri
 			break;
 		}
 
-		zend_class_entry *ce = zend_hash_find_ptr(EG(class_table), lc_name);
-		if (ce) {
-			return ce;
+		if (ZSTR_HAS_CE_CACHE(class_name) &&  ZSTR_GET_CE_CACHE(class_name)) {
+			return (zend_class_entry*)ZSTR_GET_CE_CACHE(class_name);
+		} else {
+			zend_class_entry *ce = zend_hash_find_ptr(EG(class_table), lc_name);
+			if (ce) {
+				return ce;
+			}
 		}
 
 		zend_hash_move_forward_ex(SPL_G(autoload_functions), &pos);
@@ -492,8 +496,8 @@ static Bucket *spl_find_registered_function(autoload_func_info *find_alfi) {
 /* {{{ Register given function as autoloader */
 PHP_FUNCTION(spl_autoload_register)
 {
-	zend_bool do_throw = 1;
-	zend_bool prepend  = 0;
+	bool do_throw = 1;
+	bool prepend  = 0;
 	zend_fcall_info fci = {0};
 	zend_fcall_info_cache fcc;
 	autoload_func_info *alfi;
@@ -519,6 +523,13 @@ PHP_FUNCTION(spl_autoload_register)
 
 	/* If first arg is not null */
 	if (ZEND_FCI_INITIALIZED(fci)) {
+		if (!fcc.function_handler) {
+			/* Call trampoline has been cleared by zpp. Refetch it, because we want to deal
+			 * with it outselves. It is important that it is not refetched on every call,
+			 * because calls may occur from different scopes. */
+			zend_is_callable_ex(&fci.function_name, NULL, 0, NULL, &fcc, NULL);
+		}
+
 		if (fcc.function_handler->type == ZEND_INTERNAL_FUNCTION &&
 			fcc.function_handler->internal_function.handler == zif_spl_autoload_call) {
 			zend_argument_value_error(1, "must not be the spl_autoload_call() function");
@@ -562,11 +573,11 @@ PHP_FUNCTION(spl_autoload_unregister)
 	zend_fcall_info fci;
 	zend_fcall_info_cache fcc;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "f", &fci, &fcc) == FAILURE) {
-		RETURN_THROWS();
-	}
+	ZEND_PARSE_PARAMETERS_START(1, 1)
+		Z_PARAM_FUNC(fci, fcc)
+	ZEND_PARSE_PARAMETERS_END();
 
-	if (zend_string_equals_literal(
+	if (fcc.function_handler && zend_string_equals_literal(
 			fcc.function_handler->common.function_name, "spl_autoload_call")) {
 		/* Don't destroy the hash table, as we might be iterating over it right now. */
 		zend_hash_clean(SPL_G(autoload_functions));
@@ -597,17 +608,15 @@ PHP_FUNCTION(spl_autoload_functions)
 	if (SPL_G(autoload_functions)) {
 		ZEND_HASH_FOREACH_PTR(SPL_G(autoload_functions), alfi) {
 			if (alfi->closure) {
-				zval obj_zv;
-				ZVAL_OBJ_COPY(&obj_zv, alfi->closure);
-				add_next_index_zval(return_value, &obj_zv);
+				GC_ADDREF(alfi->closure);
+				add_next_index_object(return_value, alfi->closure);
 			} else if (alfi->func_ptr->common.scope) {
 				zval tmp;
 
 				array_init(&tmp);
 				if (alfi->obj) {
-					zval obj_zv;
-					ZVAL_OBJ_COPY(&obj_zv, alfi->obj);
-					add_next_index_zval(&tmp, &obj_zv);
+					GC_ADDREF(alfi->obj);
+					add_next_index_object(&tmp, alfi->obj);
 				} else {
 					add_next_index_str(&tmp, zend_string_copy(alfi->ce->name));
 				}
@@ -623,11 +632,11 @@ PHP_FUNCTION(spl_autoload_functions)
 /* {{{ Return hash id for given object */
 PHP_FUNCTION(spl_object_hash)
 {
-	zval *obj;
+	zend_object *obj;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "o", &obj) == FAILURE) {
-		RETURN_THROWS();
-	}
+	ZEND_PARSE_PARAMETERS_START(1, 1)
+		Z_PARAM_OBJ(obj)
+	ZEND_PARSE_PARAMETERS_END();
 
 	RETURN_NEW_STR(php_spl_object_hash(obj));
 }
@@ -636,17 +645,17 @@ PHP_FUNCTION(spl_object_hash)
 /* {{{ Returns the integer object handle for the given object */
 PHP_FUNCTION(spl_object_id)
 {
-	zval *obj;
+	zend_object *obj;
 
 	ZEND_PARSE_PARAMETERS_START(1, 1)
-		Z_PARAM_OBJECT(obj)
+		Z_PARAM_OBJ(obj)
 	ZEND_PARSE_PARAMETERS_END();
 
-	RETURN_LONG((zend_long)Z_OBJ_HANDLE_P(obj));
+	RETURN_LONG((zend_long)obj->handle);
 }
 /* }}} */
 
-PHPAPI zend_string *php_spl_object_hash(zval *obj) /* {{{*/
+PHPAPI zend_string *php_spl_object_hash(zend_object *obj) /* {{{*/
 {
 	intptr_t hash_handle, hash_handlers;
 
@@ -656,7 +665,7 @@ PHPAPI zend_string *php_spl_object_hash(zval *obj) /* {{{*/
 		SPL_G(hash_mask_init) = 1;
 	}
 
-	hash_handle   = SPL_G(hash_mask_handle)^(intptr_t)Z_OBJ_HANDLE_P(obj);
+	hash_handle   = SPL_G(hash_mask_handle)^(intptr_t)obj->handle;
 	hash_handlers = SPL_G(hash_mask_handlers);
 
 	return strpprintf(32, "%016zx%016zx", hash_handle, hash_handlers);

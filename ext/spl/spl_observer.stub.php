@@ -1,6 +1,6 @@
 <?php
 
-/** @generate-function-entries */
+/** @generate-class-entries */
 
 interface SplObserver
 {
@@ -22,11 +22,8 @@ interface SplSubject
 
 class SplObjectStorage implements Countable, Iterator, Serializable, ArrayAccess
 {
-    /**
-     * @param mixed $info
-     * @return void
-     */
-    public function attach(object $object, $info = null) {}
+    /** @return void */
+    public function attach(object $object, mixed $info = null) {}
 
     /** @return void */
     public function detach(object $object) {}
@@ -46,11 +43,8 @@ class SplObjectStorage implements Countable, Iterator, Serializable, ArrayAccess
     /** @return mixed */
     public function getInfo() {}
 
-    /**
-     * @param mixed $info
-     * @return void
-     */
-    public function setInfo($info) {}
+    /** @return void */
+    public function setInfo(mixed $info) {}
 
     /** @return int */
     public function count(int $mode = COUNT_NORMAL) {}
@@ -71,7 +65,7 @@ class SplObjectStorage implements Countable, Iterator, Serializable, ArrayAccess
     public function next() {}
 
     /** @return void */
-    public function unserialize(string $serialized) {}
+    public function unserialize(string $data) {}
 
     /** @return string */
     public function serialize() {}
@@ -79,7 +73,8 @@ class SplObjectStorage implements Countable, Iterator, Serializable, ArrayAccess
     /**
      * @param object $object
      * @return bool
-     * @alias SplObjectStorage::contains
+     * @implementation-alias SplObjectStorage::contains
+     * @no-verify Cannot specify arg type because ArrayAccess does not
      */
     public function offsetExists($object) {}
 
@@ -91,16 +86,17 @@ class SplObjectStorage implements Countable, Iterator, Serializable, ArrayAccess
 
     /**
      * @param object $object
-     * @param mixed $info
      * @return void
-     * @alias SplObjectStorage::attach
+     * @implementation-alias SplObjectStorage::attach
+     * @no-verify Cannot specify arg type because ArrayAccess does not
      */
-    public function offsetSet($object, $info = null) {}
+    public function offsetSet($object, mixed $info = null) {}
 
     /**
      * @param object $object
      * @return void
-     * @alias SplObjectStorage::detach
+     * @implementation-alias SplObjectStorage::detach
+     * @no-verify Cannot specify arg type because ArrayAccess does not
      */
     public function offsetUnset($object) {}
 
@@ -127,12 +123,8 @@ class MultipleIterator implements Iterator
     /** @return void */
     public function setFlags(int $flags) {}
 
-    /**
-    * @param Iterator $iterator
-    * @param int|string|null $info
-    * @return void
-    */
-    public function attachIterator(Iterator $iterator, $info = null) {}
+    /** @return void */
+    public function attachIterator(Iterator $iterator, string|int|null $info = null) {}
 
     /** @return void */
     public function detachIterator(Iterator $iterator) {}
@@ -140,10 +132,7 @@ class MultipleIterator implements Iterator
     /** @return bool */
     public function containsIterator(Iterator $iterator) {}
 
-    /**
-     * @return int
-     * @alias SplObjectStorage::count
-     */
+    /** @return int */
     public function countIterators() {}
 
     /** @return void */
@@ -163,7 +152,7 @@ class MultipleIterator implements Iterator
 
     /**
      * @return array
-     * @alias SplObjectStorage::__debugInfo
+     * @implementation-alias SplObjectStorage::__debugInfo
      */
     public function __debugInfo() {}
 }

@@ -1,22 +1,14 @@
 <?php
 
-/** @generate-function-entries */
+/** @generate-class-entries */
 
 class SplPriorityQueue implements Iterator, Countable
 {
-    /**
-     * @param mixed $priority1
-     * @param mixed $priority2
-     * @return int
-     */
-    public function compare($priority1, $priority2) {}
+    /** @return int */
+    public function compare(mixed $priority1, mixed $priority2) {}
 
-    /**
-     * @param mixed $value
-     * @param mixed $priority
-     * @return bool
-     */
-    public function insert($value, $priority) {}
+    /** @return bool */
+    public function insert(mixed $value, mixed $priority) {}
 
     /** @return int */
     public function setExtractFlags(int $flags) {}
@@ -29,19 +21,19 @@ class SplPriorityQueue implements Iterator, Countable
 
     /**
      * @return int
-     * @alias SplHeap::count
+     * @implementation-alias SplHeap::count
      */
     public function count() {}
 
     /**
      * @return bool
-     * @alias SplHeap::isEmpty
+     * @implementation-alias SplHeap::isEmpty
      */
     public function isEmpty() {}
 
     /**
      * @return void
-     * @alias SplHeap::rewind
+     * @implementation-alias SplHeap::rewind
      */
     public function rewind() {}
 
@@ -50,31 +42,31 @@ class SplPriorityQueue implements Iterator, Countable
 
     /**
      * @return int
-     * @alias SplHeap::key
+     * @implementation-alias SplHeap::key
      */
     public function key() {}
 
     /**
      * @return void
-     * @alias SplHeap::next
+     * @implementation-alias SplHeap::next
      */
     public function next() {}
 
     /**
      * @return bool
-     * @alias SplHeap::valid
+     * @implementation-alias SplHeap::valid
      */
     public function valid() {}
 
     /**
      * @return bool
-     * @alias SplHeap::recoverFromCorruption
+     * @implementation-alias SplHeap::recoverFromCorruption
      */
     public function recoverFromCorruption() {}
 
     /**
      * @return bool
-     * @alias SplHeap::isCorrupted
+     * @implementation-alias SplHeap::isCorrupted
      */
     public function isCorrupted() {}
 
@@ -90,11 +82,8 @@ abstract class SplHeap implements Iterator, Countable
     /** @return mixed */
     public function extract() {}
 
-    /**
-     * @param mixed $value
-     * @return bool
-     */
-    public function insert($value) {}
+    /** @return bool */
+    public function insert(mixed $value) {}
 
     /** @return mixed */
     public function top() {}
@@ -123,12 +112,8 @@ abstract class SplHeap implements Iterator, Countable
     /** @return bool */
     public function recoverFromCorruption() {}
 
-    /**
-     * @param mixed $value1
-     * @param mixed $value2
-     * @return int
-     */
-    abstract protected function compare($value1, $value2);
+    /** @return int */
+    abstract protected function compare(mixed $value1, mixed $value2);
 
     /** @return bool */
     public function isCorrupted() {}
@@ -139,20 +124,12 @@ abstract class SplHeap implements Iterator, Countable
 
 class SplMinHeap extends SplHeap
 {
-    /**
-     * @param mixed $value1
-     * @param mixed $value2
-     * @return int
-     */
-    protected function compare($value1, $value2) {}
+    /** @return int */
+    protected function compare(mixed $value1, mixed $value2) {}
 }
 
 class SplMaxHeap extends SplHeap
 {
-    /**
-     * @param mixed $value1
-     * @param mixed $value2
-     * @return int
-     */
-    protected function compare($value1, $value2) {}
+    /** @return int */
+    protected function compare(mixed $value1, mixed $value2) {}
 }

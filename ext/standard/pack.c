@@ -5,7 +5,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | http://www.php.net/license/3_01.txt                                  |
+   | https://www.php.net/license/3_01.txt                                 |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -47,13 +47,21 @@
 	if ((a) < 0 || ((INT_MAX - outputpos)/((int)b)) < (a)) { \
 		efree(formatcodes);	\
 		efree(formatargs);	\
-		php_error_docref(NULL, E_WARNING, "Type %c: integer overflow in format string", code); \
-		RETURN_FALSE; \
+		zend_value_error("Type %c: integer overflow in format string", code); \
+		RETURN_THROWS(); \
 	} \
 	outputpos += (a)*(b);
 
-/* Whether machine is little endian */
-char machine_little_endian;
+#ifdef WORDS_BIGENDIAN
+#define MACHINE_LITTLE_ENDIAN 0
+#else
+#define MACHINE_LITTLE_ENDIAN 1
+#endif
+
+typedef ZEND_SET_ALIGNED(1, uint16_t unaligned_uint16_t);
+typedef ZEND_SET_ALIGNED(1, uint32_t unaligned_uint32_t);
+typedef ZEND_SET_ALIGNED(1, uint64_t unaligned_uint64_t);
+typedef ZEND_SET_ALIGNED(1, unsigned int unaligned_uint);
 
 /* Mapping of byte from char (8bit) to long for machine endian */
 static int byte_map[1];
@@ -84,7 +92,7 @@ static void php_pack(zval *val, size_t size, int *map, char *output)
 	size_t i;
 	char *v;
 
-	convert_to_long_ex(val);
+	convert_to_long(val);
 	v = (char *) &Z_LVAL_P(val);
 
 	for (i = 0; i < size; i++) {
@@ -92,6 +100,11 @@ static void php_pack(zval *val, size_t size, int *map, char *output)
 	}
 }
 /* }}} */
+
+static inline uint16_t php_pack_reverse_int16(uint16_t arg)
+{
+	return ((arg & 0xFF) << 8) | ((arg >> 8) & 0xFF);
+}
 
 /* {{{ php_pack_reverse_int32 */
 static inline uint32_t php_pack_reverse_int32(uint32_t arg)
@@ -282,8 +295,8 @@ PHP_FUNCTION(pack)
 				if (currentarg >= num_args) {
 					efree(formatcodes);
 					efree(formatargs);
-					php_error_docref(NULL, E_WARNING, "Type %c: not enough arguments", code);
-					RETURN_FALSE;
+					zend_value_error("Type %c: not enough arguments", code);
+					RETURN_THROWS();
 				}
 
 				if (arg < 0) {
@@ -313,8 +326,8 @@ PHP_FUNCTION(pack)
 #if SIZEOF_ZEND_LONG < 8
 					efree(formatcodes);
 					efree(formatargs);
-					php_error_docref(NULL, E_WARNING, "64-bit format codes are not available for 32-bit versions of PHP");
-					RETURN_FALSE;
+					zend_value_error("64-bit format codes are not available for 32-bit versions of PHP");
+					RETURN_THROWS();
 #endif
 			case 'c':
 			case 'C':
@@ -346,16 +359,16 @@ PHP_FUNCTION(pack)
 too_few_args:
 					efree(formatcodes);
 					efree(formatargs);
-					php_error_docref(NULL, E_WARNING, "Type %c: too few arguments", code);
-					RETURN_FALSE;
+					zend_value_error("Type %c: too few arguments", code);
+					RETURN_THROWS();
 				}
 				break;
 
 			default:
 				efree(formatcodes);
 				efree(formatargs);
-				php_error_docref(NULL, E_WARNING, "Type %c: unknown format code", code);
-				RETURN_FALSE;
+				zend_value_error("Type %c: unknown format code", code);
+				RETURN_THROWS();
 		}
 
 		formatcodes[formatcount] = code;
@@ -677,23 +690,6 @@ too_few_args:
 }
 /* }}} */
 
-/* {{{ php_unpack */
-static zend_long php_unpack(char *data, size_t size, int issigned, int *map)
-{
-	zend_long result;
-	char *cresult = (char *) &result;
-	size_t i;
-
-	result = issigned ? -1 : 0;
-
-	for (i = 0; i < size; i++) {
-		cresult[map[i]] = *data++;
-	}
-
-	return result;
-}
-/* }}} */
-
 /* unpack() is based on Perl's unpack(), but is modified a bit from there.
  * Rather than depending on error-prone ordered lists or syntactically
  * unpleasant pass-by-reference, we return an object with named parameters
@@ -731,9 +727,10 @@ PHP_FUNCTION(unpack)
 
 
 	if (offset < 0 || offset > inputlen) {
-		php_error_docref(NULL, E_WARNING, "Offset " ZEND_LONG_FMT " is out of input range" , offset);
-		RETURN_FALSE;
+		zend_argument_value_error(3, "must be contained in argument #2 ($data)");
+		RETURN_THROWS();
 	}
+
 	input += offset;
 	inputlen -= offset;
 
@@ -844,9 +841,8 @@ PHP_FUNCTION(unpack)
 				size = 8;
 				break;
 #else
-				php_error_docref(NULL, E_WARNING, "64-bit format codes are not available for 32-bit versions of PHP");
-				zend_array_destroy(Z_ARR_P(return_value));
-				RETURN_FALSE;
+				zend_value_error("64-bit format codes are not available for 32-bit versions of PHP");
+				RETURN_THROWS();
 #endif
 
 			/* Use sizeof(float) bytes of input */
@@ -864,10 +860,8 @@ PHP_FUNCTION(unpack)
 				break;
 
 			default:
-				php_error_docref(NULL, E_WARNING, "Invalid format type %c", type);
-				zend_array_destroy(Z_ARR_P(return_value));
-				RETURN_FALSE;
-				break;
+				zend_value_error("Invalid format type %c", type);
+				RETURN_THROWS();
 		}
 
 		if (size != 0 && size != -1 && size < 0) {
@@ -1005,108 +999,74 @@ PHP_FUNCTION(unpack)
 						break;
 					}
 
-					case 'c':
-					case 'C': {
-						int issigned = (type == 'c') ? (input[inputpos] & 0x80) : 0;
-						zend_long v = php_unpack(&input[inputpos], 1, issigned, byte_map);
+					case 'c':   /* signed */
+					case 'C': { /* unsigned */
+						uint8_t x = input[inputpos];
+						zend_long v = (type == 'c') ? (int8_t) x : x;
 						add_assoc_long(return_value, n, v);
 						break;
 					}
 
-					case 's':
-					case 'S':
-					case 'n':
-					case 'v': {
-						zend_long v;
-						int issigned = 0;
-						int *map = machine_endian_short_map;
+					case 's':   /* signed machine endian   */
+					case 'S':   /* unsigned machine endian */
+					case 'n':   /* unsigned big endian     */
+					case 'v': { /* unsigned little endian  */
+						zend_long v = 0;
+						uint16_t x = *((unaligned_uint16_t*) &input[inputpos]);
 
 						if (type == 's') {
-							issigned = input[inputpos + (machine_little_endian ? 1 : 0)] & 0x80;
-						} else if (type == 'n') {
-							map = big_endian_short_map;
-						} else if (type == 'v') {
-							map = little_endian_short_map;
+							v = (int16_t) x;
+						} else if ((type == 'n' && MACHINE_LITTLE_ENDIAN) || (type == 'v' && !MACHINE_LITTLE_ENDIAN)) {
+							v = php_pack_reverse_int16(x);
+						} else {
+							v = x;
 						}
 
-						v = php_unpack(&input[inputpos], 2, issigned, map);
 						add_assoc_long(return_value, n, v);
 						break;
 					}
 
-					case 'i':
-					case 'I': {
-						zend_long v;
-						int issigned = 0;
-
-						if (type == 'i') {
-							issigned = input[inputpos + (machine_little_endian ? (sizeof(int) - 1) : 0)] & 0x80;
-						}
-
-						v = php_unpack(&input[inputpos], sizeof(int), issigned, int_map);
+					case 'i':   /* signed integer, machine size, machine endian */
+					case 'I': { /* unsigned integer, machine size, machine endian */
+						unsigned int x = *((unaligned_uint*) &input[inputpos]);
+						zend_long v = (type == 'i') ? (int) x : x;
 						add_assoc_long(return_value, n, v);
 						break;
 					}
 
-					case 'l':
-					case 'L':
-					case 'N':
-					case 'V': {
-						int issigned = 0;
-						int *map = machine_endian_long_map;
+					case 'l':   /* signed machine endian   */
+					case 'L':   /* unsigned machine endian */
+					case 'N':   /* unsigned big endian     */
+					case 'V': { /* unsigned little endian  */
 						zend_long v = 0;
+						uint32_t x = *((unaligned_uint32_t*) &input[inputpos]);
 
-						if (type == 'l' || type == 'L') {
-							issigned = input[inputpos + (machine_little_endian ? 3 : 0)] & 0x80;
-						} else if (type == 'N') {
-							issigned = input[inputpos] & 0x80;
-							map = big_endian_long_map;
-						} else if (type == 'V') {
-							issigned = input[inputpos + 3] & 0x80;
-							map = little_endian_long_map;
+						if (type == 'l') {
+							v = (int32_t) x;
+						} else if ((type == 'N' && MACHINE_LITTLE_ENDIAN) || (type == 'V' && !MACHINE_LITTLE_ENDIAN)) {
+							v = php_pack_reverse_int32(x);
+						} else {
+							v = x;
 						}
 
-						if (SIZEOF_ZEND_LONG > 4 && issigned) {
-							v = ~INT_MAX;
-						}
-
-						v |= php_unpack(&input[inputpos], 4, issigned, map);
-						if (SIZEOF_ZEND_LONG > 4) {
- 							if (type == 'l') {
-								v = (signed int) v;
-							} else {
-								v = (unsigned int) v;
-							}
-						}
 						add_assoc_long(return_value, n, v);
 						break;
 					}
 
 #if SIZEOF_ZEND_LONG > 4
-					case 'q':
-					case 'Q':
-					case 'J':
-					case 'P': {
-						int issigned = 0;
-						int *map = machine_endian_longlong_map;
+					case 'q':   /* signed machine endian   */
+					case 'Q':   /* unsigned machine endian */
+					case 'J':   /* unsigned big endian     */
+					case 'P': { /* unsigned little endian  */
 						zend_long v = 0;
-
-						if (type == 'q' || type == 'Q') {
-							issigned = input[inputpos + (machine_little_endian ? 7 : 0)] & 0x80;
-						} else if (type == 'J') {
-							issigned = input[inputpos] & 0x80;
-							map = big_endian_longlong_map;
-						} else if (type == 'P') {
-							issigned = input[inputpos + 7] & 0x80;
-							map = little_endian_longlong_map;
-						}
-
-						v = php_unpack(&input[inputpos], 8, issigned, map);
+						uint64_t x = *((unaligned_uint64_t*) &input[inputpos]);
 
 						if (type == 'q') {
-							v = (zend_long) v;
+							v = (int64_t) x;
+						} else if ((type == 'J' && MACHINE_LITTLE_ENDIAN) || (type == 'P' && !MACHINE_LITTLE_ENDIAN)) {
+							v = php_pack_reverse_int64(x);
 						} else {
-							v = (zend_ulong) v;
+							v = x;
 						}
 
 						add_assoc_long(return_value, n, v);
@@ -1203,12 +1163,9 @@ PHP_FUNCTION(unpack)
 /* {{{ PHP_MINIT_FUNCTION */
 PHP_MINIT_FUNCTION(pack)
 {
-	int machine_endian_check = 1;
 	int i;
 
-	machine_little_endian = ((char *)&machine_endian_check)[0];
-
-	if (machine_little_endian) {
+	if (MACHINE_LITTLE_ENDIAN) {
 		/* Where to get lo to hi bytes from */
 		byte_map[0] = 0;
 

@@ -1,7 +1,7 @@
 --TEST--
 SOAP Classmap 3: encoding of inherited objects
---SKIPIF--
-<?php require_once('skipif.inc'); ?>
+--EXTENSIONS--
+soap
 --FILE--
 <?php
 ini_set("soap.wsdl_cache_enabled",0);
@@ -49,6 +49,6 @@ print_r($client->f());
 --EXPECT--
 B Object
 (
-    [y] => 6
     [x] => 5
+    [y] => 6
 )

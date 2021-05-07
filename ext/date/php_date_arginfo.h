@@ -1,5 +1,5 @@
 /* This is a generated file, edit the .stub.php file instead.
- * Stub hash: aa0e2c059662d4015658b85c932126b34934b5a4 */
+ * Stub hash: 108136459e578cc699cffcb84d3335a11f8d5c9d */
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_MASK_EX(arginfo_strtotime, 0, 1, MAY_BE_LONG|MAY_BE_FALSE)
 	ZEND_ARG_TYPE_INFO(0, datetime, IS_STRING, 0)
@@ -110,7 +110,7 @@ ZEND_BEGIN_ARG_WITH_RETURN_OBJ_TYPE_MASK_EX(arginfo_date_timezone_get, 0, 1, Dat
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_date_timezone_set, 0, 2, DateTime, 0)
-	ZEND_ARG_OBJ_INFO(0, object, DateTimeInterface, 0)
+	ZEND_ARG_OBJ_INFO(0, object, DateTime, 0)
 	ZEND_ARG_OBJ_INFO(0, timezone, DateTimeZone, 0)
 ZEND_END_ARG_INFO()
 
@@ -143,7 +143,7 @@ ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_date_isodate_set, 0, 3, DateTime,
 	ZEND_ARG_OBJ_INFO(0, object, DateTime, 0)
 	ZEND_ARG_TYPE_INFO(0, year, IS_LONG, 0)
 	ZEND_ARG_TYPE_INFO(0, week, IS_LONG, 0)
-	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, day, IS_LONG, 0, "1")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, dayOfWeek, IS_LONG, 0, "1")
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_date_timestamp_set, 0, 2, DateTime, 0)
@@ -151,9 +151,7 @@ ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_date_timestamp_set, 0, 2, DateTim
 	ZEND_ARG_TYPE_INFO(0, timestamp, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_MASK_EX(arginfo_date_timestamp_get, 0, 1, MAY_BE_LONG|MAY_BE_FALSE)
-	ZEND_ARG_OBJ_INFO(0, object, DateTimeInterface, 0)
-ZEND_END_ARG_INFO()
+#define arginfo_date_timestamp_get arginfo_date_offset_get
 
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_TYPE_MASK_EX(arginfo_timezone_open, 0, 1, DateTimeZone, MAY_BE_FALSE)
 	ZEND_ARG_TYPE_INFO(0, timezone, IS_STRING, 0)
@@ -184,7 +182,7 @@ ZEND_BEGIN_ARG_WITH_RETURN_TYPE_MASK_EX(arginfo_timezone_location_get, 0, 1, MAY
 	ZEND_ARG_OBJ_INFO(0, object, DateTimeZone, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_MASK_EX(arginfo_timezone_identifiers_list, 0, 0, MAY_BE_ARRAY|MAY_BE_FALSE)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_timezone_identifiers_list, 0, 0, IS_ARRAY, 0)
 	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, timezoneGroup, IS_LONG, 0, "DateTimeZone::ALL")
 	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, countryCode, IS_STRING, 1, "null")
 ZEND_END_ARG_INFO()
@@ -205,7 +203,7 @@ ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_date_interval_format, 0, 2, IS_S
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_date_default_timezone_set, 0, 1, _IS_BOOL, 0)
-	ZEND_ARG_TYPE_INFO(0, timezoneID, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, timezoneId, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 #define arginfo_date_default_timezone_get arginfo_timezone_version_get
@@ -216,7 +214,7 @@ ZEND_BEGIN_ARG_WITH_RETURN_TYPE_MASK_EX(arginfo_date_sunrise, 0, 1, MAY_BE_STRIN
 	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, latitude, IS_DOUBLE, 1, "null")
 	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, longitude, IS_DOUBLE, 1, "null")
 	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, zenith, IS_DOUBLE, 1, "null")
-	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, utcOffset, IS_DOUBLE, 0, "0")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, utcOffset, IS_DOUBLE, 1, "null")
 ZEND_END_ARG_INFO()
 
 #define arginfo_date_sunset arginfo_date_sunrise
@@ -337,10 +335,7 @@ ZEND_END_ARG_INFO()
 
 #define arginfo_class_DateTimeImmutable_getTimestamp arginfo_class_DateTimeInterface_getTimezone
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_class_DateTimeImmutable_diff, 0, 0, 1)
-	ZEND_ARG_OBJ_INFO(0, object, DateTimeInterface, 0)
-	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, absolute, _IS_BOOL, 0, "false")
-ZEND_END_ARG_INFO()
+#define arginfo_class_DateTimeImmutable_diff arginfo_class_DateTimeInterface_diff
 
 #define arginfo_class_DateTimeImmutable_modify arginfo_class_DateTime_modify
 
@@ -373,7 +368,7 @@ ZEND_END_ARG_INFO()
 #define arginfo_class_DateTimeZone_getName arginfo_class_DateTimeInterface_getTimezone
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_DateTimeZone_getOffset, 0, 0, 1)
-	ZEND_ARG_OBJ_INFO(0, object, DateTimeInterface, 0)
+	ZEND_ARG_OBJ_INFO(0, datetime, DateTimeInterface, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_DateTimeZone_getTransitions, 0, 0, 0)
@@ -662,3 +657,66 @@ static const zend_function_entry class_DatePeriod_methods[] = {
 	ZEND_ME(DatePeriod, getIterator, arginfo_class_DatePeriod_getIterator, ZEND_ACC_PUBLIC)
 	ZEND_FE_END
 };
+
+static zend_class_entry *register_class_DateTimeInterface(void)
+{
+	zend_class_entry ce, *class_entry;
+
+	INIT_CLASS_ENTRY(ce, "DateTimeInterface", class_DateTimeInterface_methods);
+	class_entry = zend_register_internal_interface(&ce);
+
+	return class_entry;
+}
+
+static zend_class_entry *register_class_DateTime(zend_class_entry *class_entry_DateTimeInterface)
+{
+	zend_class_entry ce, *class_entry;
+
+	INIT_CLASS_ENTRY(ce, "DateTime", class_DateTime_methods);
+	class_entry = zend_register_internal_class_ex(&ce, NULL);
+	zend_class_implements(class_entry, 1, class_entry_DateTimeInterface);
+
+	return class_entry;
+}
+
+static zend_class_entry *register_class_DateTimeImmutable(zend_class_entry *class_entry_DateTimeInterface)
+{
+	zend_class_entry ce, *class_entry;
+
+	INIT_CLASS_ENTRY(ce, "DateTimeImmutable", class_DateTimeImmutable_methods);
+	class_entry = zend_register_internal_class_ex(&ce, NULL);
+	zend_class_implements(class_entry, 1, class_entry_DateTimeInterface);
+
+	return class_entry;
+}
+
+static zend_class_entry *register_class_DateTimeZone(void)
+{
+	zend_class_entry ce, *class_entry;
+
+	INIT_CLASS_ENTRY(ce, "DateTimeZone", class_DateTimeZone_methods);
+	class_entry = zend_register_internal_class_ex(&ce, NULL);
+
+	return class_entry;
+}
+
+static zend_class_entry *register_class_DateInterval(void)
+{
+	zend_class_entry ce, *class_entry;
+
+	INIT_CLASS_ENTRY(ce, "DateInterval", class_DateInterval_methods);
+	class_entry = zend_register_internal_class_ex(&ce, NULL);
+
+	return class_entry;
+}
+
+static zend_class_entry *register_class_DatePeriod(zend_class_entry *class_entry_IteratorAggregate)
+{
+	zend_class_entry ce, *class_entry;
+
+	INIT_CLASS_ENTRY(ce, "DatePeriod", class_DatePeriod_methods);
+	class_entry = zend_register_internal_class_ex(&ce, NULL);
+	zend_class_implements(class_entry, 1, class_entry_IteratorAggregate);
+
+	return class_entry;
+}

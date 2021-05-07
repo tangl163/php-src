@@ -1,19 +1,25 @@
 <?php
 
-/** @generate-function-entries */
+/** @generate-class-entries */
 
 class Spoofchecker
 {
     public function __construct() {}
 
-    /** @return bool */
-    public function isSuspicious(string $text, &$error = null) {}
+    /**
+     * @param int $errorCode
+     * @return bool
+     */
+    public function isSuspicious(string $string, &$errorCode = null) {}
 
-    /** @return bool */
-    public function areConfusable(string $s1, string $s2, &$error = null) {}
+    /**
+     * @param int $errorCode
+     * @return bool
+     */
+    public function areConfusable(string $string1, string $string2, &$errorCode = null) {}
 
     /** @return void */
-    public function setAllowedLocales(string $locale_list) {}
+    public function setAllowedLocales(string $locales) {}
 
     /** @return void */
     public function setChecks(int $checks) {}

@@ -3,7 +3,7 @@ IntlCalendar::toDateTime(): bad arguments
 --SKIPIF--
 <?php
 if (!extension_loaded('intl'))
-	die('skip intl extension not enabled');
+    die('skip intl extension not enabled');
 --FILE--
 <?php
 ini_set("intl.error_level", E_WARNING);
@@ -40,6 +40,7 @@ try {
 } catch (\TypeError $e) {
     echo $e->getMessage() . \PHP_EOL;
 }
+?>
 --EXPECTF--
 Warning: IntlCalendar::toDateTime(): intlcal_to_date_time: DateTimeZone constructor threw exception in %s on line %d
 string(77) "exception: DateTimeZone::__construct(): Unknown or bad timezone (Etc/Unknown)"

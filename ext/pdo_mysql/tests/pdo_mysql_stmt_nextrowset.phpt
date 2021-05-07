@@ -1,7 +1,5 @@
 --TEST--
 MySQL PDOStatement->nextRowSet()
---XFAIL--
-nextRowset() problem with stored proc & emulation mode & mysqlnd
 --SKIPIF--
 <?php
 require_once(__DIR__ . DIRECTORY_SEPARATOR . 'skipif.inc');
@@ -11,15 +9,15 @@ $db = MySQLPDOTest::factory();
 $row = $db->query('SELECT VERSION() as _version')->fetch(PDO::FETCH_ASSOC);
 $matches = array();
 if (!preg_match('/^(\d+)\.(\d+)\.(\d+)/ismU', $row['_version'], $matches))
-	die(sprintf("skip Cannot determine MySQL Server version\n"));
+    die(sprintf("skip Cannot determine MySQL Server version\n"));
 
 $version = $matches[1] * 10000 + $matches[2] * 100 + $matches[3];
 if ($version < 50000)
-	die(sprintf("skip Need MySQL Server 5.0.0+, found %d.%02d.%02d (%d)\n",
-		$matches[1], $matches[2], $matches[3], $version));
+    die(sprintf("skip Need MySQL Server 5.0.0+, found %d.%02d.%02d (%d)\n",
+        $matches[1], $matches[2], $matches[3], $version));
 
 if (!MySQLPDOTest::isPDOMySQLnd())
-	die("skip This will not work with libmysql");
+    die("skip This will not work with libmysql");
 ?>
 --FILE--
 <?php
@@ -32,10 +30,6 @@ if (!MySQLPDOTest::isPDOMySQLnd())
     $stmt = $db->query('SELECT id FROM test');
     if (false !== ($tmp = $stmt->nextRowSet()))
         printf("[002] Expecting false got %s\n", var_export($tmp, true));
-
-    // TODO: should give a warning, but its PDO, let's ignore the missing warning for now
-    if (false !== ($tmp = $stmt->nextRowSet(1)))
-        printf("[003] Expecting false got %s\n", var_export($tmp, true));
 
     function test_proc1($db) {
 
@@ -63,6 +57,11 @@ if (!MySQLPDOTest::isPDOMySQLnd())
         } while ($stmt->nextRowSet());
         var_dump($stmt->nextRowSet());
 
+        echo "Skip fetchAll(): ";
+        unset($stmt);
+        $stmt = $db->query('CALL p()');
+        var_dump($stmt->nextRowSet());
+        $stmt->closeCursor();
     }
 
     try {
@@ -163,7 +162,10 @@ array(3) {
     string(1) "a"
   }
 }
+array(0) {
+}
 bool(false)
+Skip fetchAll(): bool(true)
 array(1) {
   [0]=>
   array(1) {
@@ -212,7 +214,10 @@ array(3) {
     string(1) "a"
   }
 }
+array(0) {
+}
 bool(false)
+Skip fetchAll(): bool(true)
 Native PS...
 array(1) {
   [0]=>
@@ -262,7 +267,10 @@ array(3) {
     string(1) "a"
   }
 }
+array(0) {
+}
 bool(false)
+Skip fetchAll(): bool(true)
 array(1) {
   [0]=>
   array(1) {
@@ -311,5 +319,8 @@ array(3) {
     string(1) "a"
   }
 }
+array(0) {
+}
 bool(false)
+Skip fetchAll(): bool(true)
 done!

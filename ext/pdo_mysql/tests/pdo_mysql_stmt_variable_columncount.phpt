@@ -1,7 +1,5 @@
 --TEST--
 MySQL Prepared Statements and different column counts
---XFAIL--
-nextRowset() problem with stored proc & emulation mode & mysqlnd
 --SKIPIF--
 <?php
 require_once(__DIR__ . DIRECTORY_SEPARATOR . 'skipif.inc');
@@ -12,12 +10,12 @@ $db = MySQLPDOTest::factory();
 $row = $db->query('SELECT VERSION() as _version')->fetch(PDO::FETCH_ASSOC);
 $matches = array();
 if (!preg_match('/^(\d+)\.(\d+)\.(\d+)/ismU', $row['_version'], $matches))
-	die(sprintf("skip Cannot determine MySQL Server version\n"));
+    die(sprintf("skip Cannot determine MySQL Server version\n"));
 
 $version = $matches[1] * 10000 + $matches[2] * 100 + $matches[3];
 if ($version < 50000)
-	die(sprintf("skip Need MySQL Server 5.0.0+, found %d.%02d.%02d (%d)\n",
-		$matches[1], $matches[2], $matches[3], $version));
+    die(sprintf("skip Need MySQL Server 5.0.0+, found %d.%02d.%02d (%d)\n",
+        $matches[1], $matches[2], $matches[3], $version));
 ?>
 --FILE--
 <?php
@@ -25,10 +23,8 @@ if ($version < 50000)
     $db = MySQLPDOTest::factory();
 
     function check_result($offset, $stmt, $columns) {
-
-        do {
-                $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        } while ($stmt->nextRowSet());
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt->nextRowSet();
 
         if (!isset($row['one']) || ($row['one'] != 1)) {
                 printf("[%03d + 1] Expecting array('one' => 1), got %s\n", $offset, var_export($row, true));
@@ -120,6 +116,12 @@ if ($version < 50000)
     }
 
     print "done!";
+?>
+--CLEAN--
+<?php
+require_once __DIR__ . DIRECTORY_SEPARATOR . 'mysql_pdo_test.inc';
+$pdo = MySQLPDOTest::factory();
+$pdo->query('DROP PROCEDURE IF EXISTS p');
 ?>
 --EXPECT--
 done!

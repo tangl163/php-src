@@ -1,5 +1,5 @@
 /* This is a generated file, edit the .stub.php file instead.
- * Stub hash: 22aaae107ec0c1c81a3f7135ffd7d22507437c57 */
+ * Stub hash: a469366b28d26706862ecddae69497fe3e06f137 */
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_SplObserver_update, 0, 0, 1)
 	ZEND_ARG_OBJ_INFO(0, subject, SplSubject, 0)
@@ -16,7 +16,7 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_SplObjectStorage_attach, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, object, IS_OBJECT, 0)
-	ZEND_ARG_INFO_WITH_DEFAULT_VALUE(0, info, "null")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, info, IS_MIXED, 0, "null")
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_SplObjectStorage_detach, 0, 0, 1)
@@ -36,7 +36,7 @@ ZEND_END_ARG_INFO()
 #define arginfo_class_SplObjectStorage_getInfo arginfo_class_SplSubject_notify
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_SplObjectStorage_setInfo, 0, 0, 1)
-	ZEND_ARG_INFO(0, info)
+	ZEND_ARG_TYPE_INFO(0, info, IS_MIXED, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_SplObjectStorage_count, 0, 0, 0)
@@ -54,7 +54,7 @@ ZEND_END_ARG_INFO()
 #define arginfo_class_SplObjectStorage_next arginfo_class_SplSubject_notify
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_SplObjectStorage_unserialize, 0, 0, 1)
-	ZEND_ARG_TYPE_INFO(0, serialized, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, data, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 #define arginfo_class_SplObjectStorage_serialize arginfo_class_SplSubject_notify
@@ -67,7 +67,7 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_SplObjectStorage_offsetSet, 0, 0, 1)
 	ZEND_ARG_INFO(0, object)
-	ZEND_ARG_INFO_WITH_DEFAULT_VALUE(0, info, "null")
+	ZEND_ARG_TYPE_INFO_WITH_DEFAULT_VALUE(0, info, IS_MIXED, 0, "null")
 ZEND_END_ARG_INFO()
 
 #define arginfo_class_SplObjectStorage_offsetUnset arginfo_class_SplObjectStorage_offsetExists
@@ -94,7 +94,7 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_MultipleIterator_attachIterator, 0, 0, 1)
 	ZEND_ARG_OBJ_INFO(0, iterator, Iterator, 0)
-	ZEND_ARG_INFO_WITH_DEFAULT_VALUE(0, info, "null")
+	ZEND_ARG_TYPE_MASK(0, info, MAY_BE_STRING|MAY_BE_LONG|MAY_BE_NULL, "null")
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_class_MultipleIterator_detachIterator, 0, 0, 1)
@@ -145,6 +145,7 @@ ZEND_METHOD(MultipleIterator, setFlags);
 ZEND_METHOD(MultipleIterator, attachIterator);
 ZEND_METHOD(MultipleIterator, detachIterator);
 ZEND_METHOD(MultipleIterator, containsIterator);
+ZEND_METHOD(MultipleIterator, countIterators);
 ZEND_METHOD(MultipleIterator, rewind);
 ZEND_METHOD(MultipleIterator, valid);
 ZEND_METHOD(MultipleIterator, key);
@@ -202,7 +203,7 @@ static const zend_function_entry class_MultipleIterator_methods[] = {
 	ZEND_ME(MultipleIterator, attachIterator, arginfo_class_MultipleIterator_attachIterator, ZEND_ACC_PUBLIC)
 	ZEND_ME(MultipleIterator, detachIterator, arginfo_class_MultipleIterator_detachIterator, ZEND_ACC_PUBLIC)
 	ZEND_ME(MultipleIterator, containsIterator, arginfo_class_MultipleIterator_containsIterator, ZEND_ACC_PUBLIC)
-	ZEND_MALIAS(SplObjectStorage, countIterators, count, arginfo_class_MultipleIterator_countIterators, ZEND_ACC_PUBLIC)
+	ZEND_ME(MultipleIterator, countIterators, arginfo_class_MultipleIterator_countIterators, ZEND_ACC_PUBLIC)
 	ZEND_ME(MultipleIterator, rewind, arginfo_class_MultipleIterator_rewind, ZEND_ACC_PUBLIC)
 	ZEND_ME(MultipleIterator, valid, arginfo_class_MultipleIterator_valid, ZEND_ACC_PUBLIC)
 	ZEND_ME(MultipleIterator, key, arginfo_class_MultipleIterator_key, ZEND_ACC_PUBLIC)
@@ -211,3 +212,45 @@ static const zend_function_entry class_MultipleIterator_methods[] = {
 	ZEND_MALIAS(SplObjectStorage, __debugInfo, __debugInfo, arginfo_class_MultipleIterator___debugInfo, ZEND_ACC_PUBLIC)
 	ZEND_FE_END
 };
+
+static zend_class_entry *register_class_SplObserver(void)
+{
+	zend_class_entry ce, *class_entry;
+
+	INIT_CLASS_ENTRY(ce, "SplObserver", class_SplObserver_methods);
+	class_entry = zend_register_internal_interface(&ce);
+
+	return class_entry;
+}
+
+static zend_class_entry *register_class_SplSubject(void)
+{
+	zend_class_entry ce, *class_entry;
+
+	INIT_CLASS_ENTRY(ce, "SplSubject", class_SplSubject_methods);
+	class_entry = zend_register_internal_interface(&ce);
+
+	return class_entry;
+}
+
+static zend_class_entry *register_class_SplObjectStorage(zend_class_entry *class_entry_Countable, zend_class_entry *class_entry_Iterator, zend_class_entry *class_entry_Serializable, zend_class_entry *class_entry_ArrayAccess)
+{
+	zend_class_entry ce, *class_entry;
+
+	INIT_CLASS_ENTRY(ce, "SplObjectStorage", class_SplObjectStorage_methods);
+	class_entry = zend_register_internal_class_ex(&ce, NULL);
+	zend_class_implements(class_entry, 4, class_entry_Countable, class_entry_Iterator, class_entry_Serializable, class_entry_ArrayAccess);
+
+	return class_entry;
+}
+
+static zend_class_entry *register_class_MultipleIterator(zend_class_entry *class_entry_Iterator)
+{
+	zend_class_entry ce, *class_entry;
+
+	INIT_CLASS_ENTRY(ce, "MultipleIterator", class_MultipleIterator_methods);
+	class_entry = zend_register_internal_class_ex(&ce, NULL);
+	zend_class_implements(class_entry, 1, class_entry_Iterator);
+
+	return class_entry;
+}

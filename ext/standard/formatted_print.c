@@ -5,7 +5,7 @@
    | This source file is subject to version 3.01 of the PHP license,      |
    | that is bundled with this package in the file LICENSE, and is        |
    | available through the world-wide-web at the following url:           |
-   | http://www.php.net/license/3_01.txt                                  |
+   | https://www.php.net/license/3_01.txt                                 |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
@@ -704,7 +704,7 @@ php_formatted_print(char *format, size_t format_len, zval *args, int argc, int n
 						zend_value_error("Missing format specifier at end of string");
 						goto fail;
 					}
-					/* break missing intentionally */
+					ZEND_FALLTHROUGH;
 
 				default:
 					zend_value_error("Unknown format specifier \"%c\"", *format);
@@ -719,7 +719,7 @@ php_formatted_print(char *format, size_t format_len, zval *args, int argc, int n
 		if (nb_additional_parameters == -1) {
 			zend_value_error("The arguments array must contain %d items, %d given", max_missing_argnum + 1, argc);
 		} else {
-			zend_argument_count_error("%d parameters are required, %d given", max_missing_argnum + nb_additional_parameters + 1, argc + nb_additional_parameters);
+			zend_argument_count_error("%d arguments are required, %d given", max_missing_argnum + nb_additional_parameters + 1, argc + nb_additional_parameters);
 		}
 		goto fail;
 	}
@@ -770,7 +770,7 @@ PHP_FUNCTION(sprintf)
 
 	result = php_formatted_print(format, format_len, args, argc, 1);
 	if (result == NULL) {
-		return;
+		RETURN_THROWS();
 	}
 	RETVAL_STR(result);
 }
@@ -796,7 +796,7 @@ PHP_FUNCTION(vsprintf)
 	result = php_formatted_print(format, format_len, args, argc, -1);
 	efree(args);
 	if (result == NULL) {
-		return;
+		RETURN_THROWS();
 	}
 	RETVAL_STR(result);
 }
@@ -819,7 +819,7 @@ PHP_FUNCTION(printf)
 
 	result = php_formatted_print(format, format_len, args, argc, 1);
 	if (result == NULL) {
-		return;
+		RETURN_THROWS();
 	}
 	rlen = PHPWRITE(ZSTR_VAL(result), ZSTR_LEN(result));
 	zend_string_efree(result);
@@ -848,7 +848,7 @@ PHP_FUNCTION(vprintf)
 	result = php_formatted_print(format, format_len, args, argc, -1);
 	efree(args);
 	if (result == NULL) {
-		return;
+		RETURN_THROWS();
 	}
 	rlen = PHPWRITE(ZSTR_VAL(result), ZSTR_LEN(result));
 	zend_string_efree(result);
@@ -866,10 +866,6 @@ PHP_FUNCTION(fprintf)
 	int argc;
 	zend_string *result;
 
-	if (ZEND_NUM_ARGS() < 2) {
-		WRONG_PARAM_COUNT;
-	}
-
 	ZEND_PARSE_PARAMETERS_START(2, -1)
 		Z_PARAM_RESOURCE(arg1)
 		Z_PARAM_STRING(format, format_len)
@@ -880,7 +876,7 @@ PHP_FUNCTION(fprintf)
 
 	result = php_formatted_print(format, format_len, args, argc, 2);
 	if (result == NULL) {
-		return;
+		RETURN_THROWS();
 	}
 
 	php_stream_write(stream, ZSTR_VAL(result), ZSTR_LEN(result));
@@ -901,10 +897,6 @@ PHP_FUNCTION(vfprintf)
 	int argc;
 	zend_string *result;
 
-	if (ZEND_NUM_ARGS() != 3) {
-		WRONG_PARAM_COUNT;
-	}
-
 	ZEND_PARSE_PARAMETERS_START(3, 3)
 		Z_PARAM_RESOURCE(arg1)
 		Z_PARAM_STRING(format, format_len)
@@ -918,7 +910,7 @@ PHP_FUNCTION(vfprintf)
 	result = php_formatted_print(format, format_len, args, argc, -1);
 	efree(args);
 	if (result == NULL) {
-		return;
+		RETURN_THROWS();
 	}
 
 	php_stream_write(stream, ZSTR_VAL(result), ZSTR_LEN(result));

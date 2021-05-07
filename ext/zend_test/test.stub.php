@@ -1,16 +1,44 @@
 <?php
 
-/** @generate-function-entries */
+/** @generate-class-entries static */
 
-class _ZendTestClass {
+namespace {
+
+interface _ZendTestInterface
+{
+}
+
+/** @alias _ZendTestClassAlias */
+class _ZendTestClass implements _ZendTestInterface {
+    /** @var mixed */
+    public static $_StaticProp;
+    public static int $staticIntProp = 123;
+
+    public int $intProp = 123;
+    public ?stdClass $classProp = null;
+    public stdClass|Iterator|null $classUnionProp = null;
+
     public static function is_object(): int {}
 
     /** @deprecated */
     public function __toString(): string {}
+
+    public function returnsStatic(): static {}
+}
+
+class _ZendTestChildClass extends _ZendTestClass
+{
 }
 
 trait _ZendTestTrait {
+    /** @var mixed */
+    public $testProp;
+
     public function testMethod(): bool {}
+}
+
+final class ZendTestAttribute {
+
 }
 
 function zend_test_array_return(): array {}
@@ -39,3 +67,33 @@ function zend_string_or_stdclass($param): stdClass|string {}
 
 /** @param stdClass|string|null $param */
 function zend_string_or_stdclass_or_null($param): stdClass|string|null {}
+
+function zend_iterable(iterable $arg1, ?iterable $arg2 = null): void {}
+
+}
+
+namespace ZendTestNS {
+
+class Foo {
+    public function method(): void {}
+}
+
+}
+
+namespace ZendTestNS2 {
+
+class Foo {
+    public function method(): void {}
+}
+
+}
+
+namespace ZendTestNS2\ZendSubNS {
+
+class Foo {
+    public function method(): void {}
+}
+
+function namespaced_func(): bool {}
+
+}
